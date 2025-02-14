@@ -1,9 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-abstract class _BaseBlocState<T> extends Equatable {
-  final String? message;
-  const _BaseBlocState(this.message);
-
+extension BlocStateExt<T> on BlocState<T> {
   /// Handles different BlocState types and executes the corresponding function.
   ///
   /// - Parameters:
@@ -29,24 +26,6 @@ abstract class _BaseBlocState<T> extends Equatable {
     }
   }
 
-  // R on_<R>(
-  //   Map<Type, Function(dynamic)> states, {
-  //   required R def,
-  // }) {
-  //   for (var e in states.entries) {
-  //     if (runtimeType == e.key.runtimeType) return e.value(this as T);
-  //   }
-  //   return def;
-  // }
-}
-
-/// A abstract class for representing different states in a BLoC.
-///
-/// This class is used to define various states that a BLoC can be in,
-/// such as initial, loading, success, or failure states.
-abstract class BlocState<T> extends _BaseBlocState<T> {
-  const BlocState(super.message);
-
   /// Checks if all elements in the provided list are of type `T`.
   static bool areAll<R extends BlocState>(List<BlocState> states) => states.every((state) => state is R);
 
@@ -64,6 +43,15 @@ abstract class BlocState<T> extends _BaseBlocState<T> {
 
   /// Checks if the current state is a failure state.
   bool get isFailure => this is BlocStateFailure<T>;
+}
+
+/// A abstract class for representing different states in a BLoC.
+///
+/// This class is used to define various states that a BLoC can be in,
+/// such as initial, loading, success, or failure states.
+abstract class BlocState<T> extends Equatable {
+  final String? message;
+  const BlocState(this.message);
 }
 
 /// Represents the initial state of a BLoC.

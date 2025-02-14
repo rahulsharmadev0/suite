@@ -1,70 +1,65 @@
-import 'package:example/bloc_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-// Event
-abstract class CounterEvent {}
-
-class Increment extends CounterEvent {}
-
-class Decrement extends CounterEvent {}
+import 'package:bloc_suite/bloc_suite.dart';
 
 // State
 class CounterState {
   final int counterValue;
-  CounterState(this.counterValue);
+  const CounterState(this.counterValue);
+
+  @override
+  String toString() => 'CounterState { counterValue: $counterValue }';
 }
 
 // Bloc
-class CounterBloc extends Bloc<CounterEvent, CounterState> {
-  CounterBloc() : super(CounterState(0)) {
-    on<Increment>(_incrementCounter);
-    on<Decrement>(_decrementCounter);
-  }
+class CounterBloc extends Cubit<CounterState> {
+  CounterBloc() : super(CounterState(0));
 
-  _incrementCounter(CounterEvent event, Emitter<CounterState> emit) {
-    emit(CounterState(state.counterValue + 1));
-  }
+  void increment() => emit(CounterState(state.counterValue + 1));
 
-  _decrementCounter(CounterEvent event, Emitter<CounterState> emit) {
-    emit(CounterState(state.counterValue - 1));
-  }
+  void decrement() => emit(CounterState(state.counterValue - 1));
+}
+
+class CounterScreen extends StatelessWidget {
+  const CounterScreen({super.key});
 
   @override
-  Future<void> close() {
-    print('CounterBloc closed');
-    return super.close();
+  Widget build(context) {
+    final bloc = CounterBloc();
+    return BlocProvider(
+      create: (context) => bloc,
+      child: Scaffold(
+        appBar: AppBar(title: const Text('Counter')),
+        body: Center(child: CounterText()),
+        floatingActionButton: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: <Widget>[
+            IconButton(
+              key: const Key('increment_floatingActionButton'),
+              onPressed: () => bloc.increment(),
+              tooltip: 'Increment',
+              icon: const Icon(Icons.add),
+            ),
+            const SizedBox(height: 10),
+            IconButton(
+              key: const Key('decrement_floatingActionButton'),
+              onPressed: () => bloc.decrement(),
+              tooltip: 'Decrement',
+              icon: const Icon(Icons.remove),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 
-class CounterScreen extends BlocWidget<CounterBloc, CounterState> {
-  CounterScreen({super.key}) : super(bloc: CounterBloc());
+class CounterText extends BlocWidget<CounterBloc, CounterState> {
+  const CounterText({super.key});
 
   @override
-  Widget build(context, bloc, state) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Counter')),
-      body: Center(
-        child: Text('${state.counterValue}'),
-      ),
-      floatingActionButton: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: <Widget>[
-          IconButton(
-            key: const Key('increment_floatingActionButton'),
-            onPressed: () => bloc.add(Increment()),
-            tooltip: 'Increment',
-            icon: const Icon(Icons.add),
-          ),
-          const SizedBox(height: 10),
-          IconButton(
-            key: const Key('decrement_floatingActionButton'),
-            onPressed: () => bloc.add(Decrement()),
-            tooltip: 'Decrement',
-            icon: const Icon(Icons.remove),
-          ),
-        ],
-      ),
-    );
+  Widget build(BuildContext context, CounterBloc bloc, CounterState state) {
+    final textStyle = TextStyle(fontSize: 24, fontWeight: FontWeight.bold);
+    return Text('${state.counterValue}', style: textStyle);
   }
 }
