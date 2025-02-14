@@ -37,8 +37,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 abstract class BlocWidget<B extends StateStreamableSource<S>, S> extends StatefulWidget {
   /// {@macro bloc_builder_base}
   const BlocWidget({super.key, B? bloc, bool Function(S, S)? buildWhen})
-      : _buildWhen = buildWhen,
-        _bloc = bloc;
+    : _buildWhen = buildWhen,
+      _bloc = bloc;
 
   // internal field for the bloc
   final B? _bloc;

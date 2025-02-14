@@ -17,7 +17,7 @@ void main() {
   setUp(() {
     mockLogger = MockLogger();
     mockBloc = MockBloc();
-    observer = FlutterBlocObserver();
+    observer = FlutterBlocObserver(logger: mockLogger);
   });
 
   group('FlutterBlocObserver', () {
@@ -29,9 +29,7 @@ void main() {
     });
 
     test('does not log event when printEvents is disabled', () {
-      observer = FlutterBlocObserver(printEvents: false);
-
-      observer.onEvent(mockBloc, 'TestEvent');
+      observer.copyWith(printEvents: false).onEvent(mockBloc, 'TestEvent');
       verifyNever(() => mockLogger.i(any()));
     });
 
@@ -43,11 +41,9 @@ void main() {
     });
 
     test('does not log transition when printTransitions is disabled', () {
-      observer = FlutterBlocObserver(printTransitions: false);
-
       final transition = Transition(currentState: 'StateA', event: 'EventA', nextState: 'StateB');
 
-      observer.onTransition(mockBloc, transition);
+      observer.copyWith(printTransitions: false).onTransition(mockBloc, transition);
       verifyNever(() => mockLogger.i(any()));
     });
 
@@ -60,45 +56,34 @@ void main() {
     });
 
     test('logs creation when printCreations is enabled', () {
-      observer = FlutterBlocObserver(printCreations: true);
-
-      observer.onCreate(mockBloc);
+      observer.copyWith(printCreations: true).onCreate(mockBloc);
       verify(() => mockLogger.i(any())).called(1);
     });
 
     test('does not log creation when printCreations is disabled', () {
-      observer = FlutterBlocObserver(printCreations: false);
-      observer.onCreate(mockBloc);
+      observer.copyWith(printCreations: false).onCreate(mockBloc);
       verifyNever(() => mockLogger.i(any()));
     });
 
     test('logs closing when printClosings is enabled', () {
-      observer = FlutterBlocObserver(printClosings: true);
-
-      observer.onClose(mockBloc);
+      observer.copyWith(printClosings: true).onClose(mockBloc);
       verify(() => mockLogger.i(any())).called(1);
     });
 
     test('does not log closing when printClosings is disabled', () {
-      observer = FlutterBlocObserver(printClosings: false);
-
-      observer.onClose(mockBloc);
+      observer.copyWith(printClosings: false).onClose(mockBloc);
       verifyNever(() => mockLogger.i(any()));
     });
 
     test('respects transitionFilter', () {
-      observer = FlutterBlocObserver(transitionFilter: (bloc, transition) => false);
-
       final transition = Transition(currentState: 'StateA', event: 'EventA', nextState: 'StateB');
-
-      observer.onTransition(mockBloc, transition);
+      transitionFilter(bloc, transition) => false;
+      observer.copyWith(transitionFilter: transitionFilter).onTransition(mockBloc, transition);
       verifyNever(() => mockLogger.i(any()));
     });
 
     test('respects eventFilter', () {
-      observer = FlutterBlocObserver(eventFilter: (bloc, event) => false);
-
-      observer.onEvent(mockBloc, 'TestEvent');
+      observer.copyWith(eventFilter: (bloc, event) => false).onEvent(mockBloc, 'TestEvent');
       verifyNever(() => mockLogger.i(any()));
     });
   });

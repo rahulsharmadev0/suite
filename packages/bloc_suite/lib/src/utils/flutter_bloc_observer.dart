@@ -2,9 +2,6 @@ import 'package:bloc/bloc.dart';
 import 'package:logger/logger.dart';
 import 'package:flutter/foundation.dart';
 
-/// Global logger instance with minimal configuration
-final _log = Logger(printer: PrettyPrinter(methodCount: 0, printEmojis: false));
-
 /// A BlocObserver that provides detailed logging capabilities for Flutter Bloc events
 /// and state changes with customizable filtering options.
 final class FlutterBlocObserver extends BlocObserver {
@@ -16,8 +13,9 @@ final class FlutterBlocObserver extends BlocObserver {
   final bool printClosings;
   final bool Function(Bloc bloc, Transition transition)? transitionFilter;
   final bool Function(Bloc bloc, Object? event)? eventFilter;
+  final Logger _logger;
 
-  const FlutterBlocObserver({
+  FlutterBlocObserver({
     this.enabled = kDebugMode,
     this.printEvents = true,
     this.printTransitions = true,
@@ -26,7 +24,8 @@ final class FlutterBlocObserver extends BlocObserver {
     this.printClosings = true,
     this.transitionFilter,
     this.eventFilter,
-  });
+    Logger? logger,
+  }) : _logger = logger ?? Logger(printer: PrettyPrinter(methodCount: 0, printEmojis: false));
 
   @override
   void onEvent(Bloc bloc, Object? event) {
@@ -80,7 +79,7 @@ final class FlutterBlocObserver extends BlocObserver {
     StackTrace? stackTrace,
   }) {
     if (!enabled || !condition || !filter) return;
-    error != null ? _log.e(message, error: error, stackTrace: stackTrace) : _log.d(message);
+    error != null ? _logger.e(message, error: error, stackTrace: stackTrace) : _logger.i(message);
   }
 
   String _formatEvent(Bloc bloc, Object? event) => '📩 ${bloc.runtimeType} Event: $event}';
@@ -97,4 +96,28 @@ final class FlutterBlocObserver extends BlocObserver {
     ⤷ From: ${change.currentState}
     ⤷ To: ${change.nextState}''';
   }
+}
+
+@visibleForTesting
+extension FlutterBlocObserverExt on FlutterBlocObserver {
+  FlutterBlocObserver copyWith({
+    bool? enabled,
+    bool? printEvents,
+    bool? printTransitions,
+    bool? printChanges,
+    bool? printCreations,
+    bool? printClosings,
+    bool Function(Bloc bloc, Transition transition)? transitionFilter,
+    bool Function(Bloc bloc, Object? event)? eventFilter,
+  }) => FlutterBlocObserver(
+    enabled: enabled ?? this.enabled,
+    printEvents: printEvents ?? this.printEvents,
+    printTransitions: printTransitions ?? this.printTransitions,
+    printChanges: printChanges ?? this.printChanges,
+    printCreations: printCreations ?? this.printCreations,
+    printClosings: printClosings ?? this.printClosings,
+    transitionFilter: transitionFilter ?? this.transitionFilter,
+    eventFilter: eventFilter ?? this.eventFilter,
+    logger: _logger,
+  );
 }
