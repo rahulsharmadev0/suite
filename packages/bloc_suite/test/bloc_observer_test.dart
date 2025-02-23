@@ -4,7 +4,6 @@ import 'package:logger/logger.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
-
 // Mock classes
 class MockLogger extends Mock implements Logger {}
 
@@ -30,33 +29,21 @@ void main() {
     });
 
     test('does not log event when printEvents is disabled', () {
-      observer = FlutterBlocObserver(logger: mockLogger, printEvents: false);
-
-      observer.onEvent(mockBloc, 'TestEvent');
+      observer.copyWith(printEvents: false).onEvent(mockBloc, 'TestEvent');
       verifyNever(() => mockLogger.i(any()));
     });
 
     test('logs transition when printTransitions is enabled', () {
-      final transition = Transition(
-        currentState: 'StateA',
-        event: 'EventA',
-        nextState: 'StateB',
-      );
+      final transition = Transition(currentState: 'StateA', event: 'EventA', nextState: 'StateB');
 
       observer.onTransition(mockBloc, transition);
       verify(() => mockLogger.i(any())).called(1);
     });
 
     test('does not log transition when printTransitions is disabled', () {
-      observer = FlutterBlocObserver(logger: mockLogger, printTransitions: false);
+      final transition = Transition(currentState: 'StateA', event: 'EventA', nextState: 'StateB');
 
-      final transition = Transition(
-        currentState: 'StateA',
-        event: 'EventA',
-        nextState: 'StateB',
-      );
-
-      observer.onTransition(mockBloc, transition);
+      observer.copyWith(printTransitions: false).onTransition(mockBloc, transition);
       verifyNever(() => mockLogger.i(any()));
     });
 
@@ -69,55 +56,34 @@ void main() {
     });
 
     test('logs creation when printCreations is enabled', () {
-      observer = FlutterBlocObserver(logger: mockLogger, printCreations: true);
-
-      observer.onCreate(mockBloc);
+      observer.copyWith(printCreations: true).onCreate(mockBloc);
       verify(() => mockLogger.i(any())).called(1);
     });
 
     test('does not log creation when printCreations is disabled', () {
-      observer = FlutterBlocObserver(logger: mockLogger, printCreations: false);
-      observer.onCreate(mockBloc);
+      observer.copyWith(printCreations: false).onCreate(mockBloc);
       verifyNever(() => mockLogger.i(any()));
     });
 
     test('logs closing when printClosings is enabled', () {
-      observer = FlutterBlocObserver(logger: mockLogger, printClosings: true);
-
-      observer.onClose(mockBloc);
+      observer.copyWith(printClosings: true).onClose(mockBloc);
       verify(() => mockLogger.i(any())).called(1);
     });
 
     test('does not log closing when printClosings is disabled', () {
-      observer = FlutterBlocObserver(logger: mockLogger, printClosings: false);
-
-      observer.onClose(mockBloc);
+      observer.copyWith(printClosings: false).onClose(mockBloc);
       verifyNever(() => mockLogger.i(any()));
     });
 
     test('respects transitionFilter', () {
-      observer = FlutterBlocObserver(
-        logger: mockLogger,
-        transitionFilter: (bloc, transition) => false,
-      );
-
-      final transition = Transition(
-        currentState: 'StateA',
-        event: 'EventA',
-        nextState: 'StateB',
-      );
-
-      observer.onTransition(mockBloc, transition);
+      final transition = Transition(currentState: 'StateA', event: 'EventA', nextState: 'StateB');
+      transitionFilter(bloc, transition) => false;
+      observer.copyWith(transitionFilter: transitionFilter).onTransition(mockBloc, transition);
       verifyNever(() => mockLogger.i(any()));
     });
 
     test('respects eventFilter', () {
-      observer = FlutterBlocObserver(
-        logger: mockLogger,
-        eventFilter: (bloc, event) => false,
-      );
-
-      observer.onEvent(mockBloc, 'TestEvent');
+      observer.copyWith(eventFilter: (bloc, event) => false).onEvent(mockBloc, 'TestEvent');
       verifyNever(() => mockLogger.i(any()));
     });
   });

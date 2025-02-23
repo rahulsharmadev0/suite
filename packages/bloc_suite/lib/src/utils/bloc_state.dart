@@ -1,6 +1,6 @@
-abstract class _BaseBlocState<T> {
-  const _BaseBlocState();
+import 'package:equatable/equatable.dart';
 
+extension BlocStateExt<T> on BlocState<T> {
   /// Handles different BlocState types and executes the corresponding function.
   ///
   /// - Parameters:
@@ -26,24 +26,6 @@ abstract class _BaseBlocState<T> {
     }
   }
 
-  // R on_<R>(
-  //   Map<Type, Function(dynamic)> states, {
-  //   required R def,
-  // }) {
-  //   for (var e in states.entries) {
-  //     if (runtimeType == e.key.runtimeType) return e.value(this as T);
-  //   }
-  //   return def;
-  // }
-}
-
-/// A abstract class for representing different states in a BLoC.
-///
-/// This class is used to define various states that a BLoC can be in,
-/// such as initial, loading, success, or failure states.
-abstract class BlocState<T> extends _BaseBlocState<T> {
-  const BlocState();
-
   /// Checks if all elements in the provided list are of type `T`.
   static bool areAll<R extends BlocState>(List<BlocState> states) => states.every((state) => state is R);
 
@@ -63,8 +45,22 @@ abstract class BlocState<T> extends _BaseBlocState<T> {
   bool get isFailure => this is BlocStateFailure<T>;
 }
 
+/// A abstract class for representing different states in a BLoC.
+///
+/// This class is used to define various states that a BLoC can be in,
+/// such as initial, loading, success, or failure states.
+abstract class BlocState<T> extends Equatable {
+  final String? message;
+  const BlocState(this.message);
+}
+
 /// Represents the initial state of a BLoC.
-final class BlocStateInitial<T> extends BlocState<T> {}
+final class BlocStateInitial<T> extends BlocState<T> {
+  const BlocStateInitial([super.message]);
+
+  @override
+  List<Object?> get props => [message];
+}
 
 /// {@template .bloc_state_loading}
 /// Represents the **loading state** of a BLoC.
@@ -73,10 +69,8 @@ final class BlocStateInitial<T> extends BlocState<T> {}
 /// typically while fetching data or performing an asynchronous operation.
 /// {@endtemplate}
 final class BlocStateLoading<T> extends BlocState<T> {
-  final String? message;
-
   /// {@macro .bloc_state_loading}
-  const BlocStateLoading([this.message]);
+  const BlocStateLoading([super.message]);
 
   @override
   List<Object?> get props => [message];
@@ -90,10 +84,9 @@ final class BlocStateLoading<T> extends BlocState<T> {
 /// {@endtemplate}
 final class BlocStateSuccess<T> extends BlocState<T> {
   final T data;
-  final String? message;
 
   /// {@macro .bloc_state_success}
-  const BlocStateSuccess(this.data, {this.message});
+  const BlocStateSuccess(this.data, [super.message]);
 
   @override
   List<Object?> get props => [data, message];
@@ -106,11 +99,10 @@ final class BlocStateSuccess<T> extends BlocState<T> {
 /// and contains an error message describing the failure.
 /// {@endtemplate}
 final class BlocStateFailure<T> extends BlocState<T> {
-  final String message;
   final Object? extra;
 
   /// {@macro .bloc_state_failure}
-  const BlocStateFailure(this.message, {this.extra});
+  const BlocStateFailure(String super.message, {this.extra});
 
   @override
   List<Object?> get props => [message, this.extra];
