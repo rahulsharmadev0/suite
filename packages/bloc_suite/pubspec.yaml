@@ -4,6 +4,8 @@ maintainer: Rahul Sharma (@rahulsharmadev)
 homepage: https://github.com/rahulsharmadev0
 repository: https://github.com/rahulsharmadev0/suite/tree/main/packages/bloc_suite
 issue_tracker: https://github.com/rahulsharmadev0/suite/issues
+documentation: https://github.com/rahulsharmadev0/suite/blob/main/packages/bloc_suite/README.md
+topics: [bloc, concurrency, state-management]
 
 version: 0.0.1
 
