@@ -1,5 +1,10 @@
 name: bloc_suite
 description: A starting point for Dart libraries or applications.
+maintainer: Rahul Sharma (@rahulsharmadev)
+homepage: https://github.com/rahulsharmadev0
+repository: https://github.com/rahulsharmadev0/suite/tree/main/packages/bloc_suite
+issue_tracker: https://github.com/rahulsharmadev0/suite/issues
+
 version: 0.0.1
 
 environment:
