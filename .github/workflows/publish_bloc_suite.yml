@@ -44,8 +44,9 @@ jobs:
       - name: 🔐 Setup Pub Credentials
         if: success() && github.ref == 'refs/heads/main'
         run: |
-          mkdir -p ${{ env.XDG_CONFIG_HOME }}/dart
-          echo '${{ secrets.PUB_CREDENTIALS }}' > "${{ env.XDG_CONFIG_HOME }}/dart/pub-credentials.json"
+          mkdir -p "$XDG_CONFIG_HOME/dart"
+          echo '${{ secrets.PUB_CREDENTIALS }}' > "$XDG_CONFIG_HOME/dart/pub-credentials.json"
+          ls -l "$XDG_CONFIG_HOME/dart"
 
       - name: 🎯 Verify Package
         if: success()
