@@ -14,12 +14,12 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  bloc: ">=8.1.4"
-  flutter_bloc: ">=8.1.4"
-  equatable: ">=2.0.0"
-  logger: ">=2.5.0"
+  bloc: ">=8.1.4 <9.4.0"
+  flutter_bloc: ">=8.1.4 <9.4.0"
+  equatable: ">=2.0.0 <3.0.0"
+  logger: ">=2.5.0 <3.0.0"
+  meta: ">=1.16.0 <2.0.0"
   rxdart: ">=0.27.7 <1.0.0"
-  meta: ">=1.16.0"
 
 dev_dependencies:
   flutter_test:
