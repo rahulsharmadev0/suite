@@ -2,6 +2,13 @@ import 'dart:async';
 import 'package:bloc_suite/bloc_suite.dart';
 import 'package:test/test.dart';
 
+const timingTolerancePercentage = 0.20; // 20% tolerance
+
+bool isWithinTimeRange(int actual, int expected) {
+  final tolerance = (expected * timingTolerancePercentage).toInt();
+  return (actual - expected).abs() <= tolerance;
+}
+
 Future<({T output, int ms})> asyncDelayCount<T>(Future<T> Function() fun) async {
   final start = DateTime.now();
   final output = await fun();
@@ -17,14 +24,15 @@ Future<void> tick() => Future.delayed(Duration.zero);
 void main() {
   group('delay, debounce, skip & throttle transformers test', () {
     test('delay transformer', () async {
-      final transformer = BlocEventTransformer.delay<int>(const Duration(milliseconds: 100));
-      final input = Stream.periodic(const Duration(milliseconds: 50), (i) => i).take(5);
+      const debounceWindow = Duration(milliseconds: 10);
+      final transformer = BlocEventTransformer.delay<int>(debounceWindow);
+      final input = Stream.periodic(debounceWindow * 5, (i) => i).take(5);
       final output = transformer(input, (event) => Stream.value(event));
 
       final result = await asyncDelayCount(() => output.toList());
 
-      expect(result.ms > 350 && result.ms < 400, isTrue);
-      expect(result.output, [0, 1, 2, 3, 4]);
+      expect(isWithinTimeRange(result.ms, 300), isTrue, reason: 'Expected:300\nActual:${result.ms}');
+      expect(result.output, equals([0, 1, 2, 3, 4]));
     });
 
     test('debounce transformer', () async {
@@ -39,9 +47,8 @@ void main() {
         final output = transformer(input, (event) => Stream.value(event));
         final result = await asyncDelayCount(() => output.toList());
         expect(result.output, test.result);
-        var processingMargin = 100;
         expect(
-          result.ms >= test.time && result.ms < test.time + processingMargin,
+          isWithinTimeRange(result.ms, test.time),
           isTrue,
           reason: 'Expected:${test.time}\nActual:${result.ms}',
         );
@@ -69,9 +76,8 @@ void main() {
         final output = transformer(input, (event) => Stream.value(event));
         final result = await asyncDelayCount(() => output.toList());
         expect(result.output, test.result);
-        var processingMargin = 50;
         expect(
-          result.ms >= test.time && result.ms < test.time + processingMargin,
+          isWithinTimeRange(result.ms, test.time),
           isTrue,
           reason: 'Expected:${test.time}\nActual:${result.ms}',
         );

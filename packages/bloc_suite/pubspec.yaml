@@ -4,7 +4,6 @@ version: 0.0.1
 
 environment:
   sdk: ^3.7.0
-  flutter: ">=1.17.0"
 
 # Add regular dependencies here.
 dependencies:

@@ -1,0 +1,51 @@
+name: Publish bloc_suite to pub.dev
+
+on: [workflow_dispatch]
+
+env:
+  XDG_CONFIG_HOME: ~/.config
+  FLUTTER_VERSION: "3.16.0"
+
+jobs:
+  publish:
+    defaults:
+      run:
+        working-directory: packages/bloc_suite
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📚 Git Checkout
+        uses: actions/checkout@v4
+
+      - name: 🐦 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: "stable"
+          cache: true
+
+      - name: 📦 Install Dependencies
+        run: |
+          flutter pub get
+          flutter --version
+
+      - name: 🔍 Run Analysis
+        run: flutter analyze
+
+      - name: 🧪 Run Tests
+        run: flutter test
+
+      - name: 🔐 Setup Pub Credentials
+        if: success() && github.ref == 'refs/heads/main'
+        run: |
+          mkdir -p ${{ env.XDG_CONFIG_HOME }}/dart
+          echo '${{ secrets.PUB_CREDENTIALS }}' > "${{ env.XDG_CONFIG_HOME }}/dart/pub-credentials.json"
+
+      - name: 🎯 Verify Package
+        if: success()
+        run: flutter pub publish --dry-run
+
+      - name: 📢 Publish Package
+        if: success() && github.ref == 'refs/heads/main'
+        run: flutter pub publish -f
