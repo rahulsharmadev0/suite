@@ -1,4 +1,4 @@
-// ignore_for_file: library_private_types_in_public_api
+// ignore_for_file: library_private_types_in_public_api, prefer_function_declarations_over_variables
 import 'package:bloc/bloc.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -60,8 +60,11 @@ class BlocEventTransformer {
   ///       _handleEvent,
   ///       transformer: skip(10),
   ///     )
-  static EventTransformer<Event> throttle<Event>(Duration duration,
-          {bool trailing = false, bool leading = true}) =>
+  static EventTransformer<Event> throttle<Event>(
+    Duration duration, {
+    bool trailing = false,
+    bool leading = true,
+  }) =>
       (events, mapper) =>
           events.throttleTime(duration, trailing: trailing, leading: leading).switchMap(mapper);
 

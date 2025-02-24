@@ -39,9 +39,12 @@ void main() {
         final output = transformer(input, (event) => Stream.value(event));
         final result = await asyncDelayCount(() => output.toList());
         expect(result.output, test.result);
-        var processing_margin = 100;
-        expect(result.ms >= test.time && result.ms < test.time + processing_margin, isTrue,
-            reason: 'Expected:${test.time}\nActual:${result.ms}');
+        var processingMargin = 100;
+        expect(
+          result.ms >= test.time && result.ms < test.time + processingMargin,
+          isTrue,
+          reason: 'Expected:${test.time}\nActual:${result.ms}',
+        );
       }
     });
 
@@ -66,9 +69,12 @@ void main() {
         final output = transformer(input, (event) => Stream.value(event));
         final result = await asyncDelayCount(() => output.toList());
         expect(result.output, test.result);
-        var processing_margin = 50;
-        expect(result.ms >= test.time && result.ms < test.time + processing_margin, isTrue,
-            reason: 'Expected:${test.time}\nActual:${result.ms}');
+        var processingMargin = 50;
+        expect(
+          result.ms >= test.time && result.ms < test.time + processingMargin,
+          isTrue,
+          reason: 'Expected:${test.time}\nActual:${result.ms}',
+        );
       }
     });
   });

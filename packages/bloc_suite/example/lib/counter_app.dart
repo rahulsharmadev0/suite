@@ -6,18 +6,28 @@ import 'package:bloc_suite/bloc_suite.dart';
 class CounterState {
   final int counterValue;
   const CounterState(this.counterValue);
+}
 
-  @override
-  String toString() => 'CounterState { counterValue: $counterValue }';
+sealed class CounterEvent extends LifecycleEvent {
+  const CounterEvent({super.onCompleted, super.onError});
+}
+
+class Increment extends CounterEvent {
+  const Increment({super.onCompleted, super.onError});
+}
+
+class Decrement extends CounterEvent {
+  const Decrement({super.onCompleted, super.onError});
 }
 
 // Bloc
-class CounterBloc extends Cubit<CounterState> {
-  CounterBloc() : super(CounterState(0));
+class CounterBloc extends LifecycleBloc<CounterEvent, CounterState> {
+  CounterBloc() : super(CounterState(0)) {
+    on<Increment>((event, emit) async => emit(CounterState(state.counterValue + 1)),
+        transformer: BlocEventTransformer.throttle(const Duration(milliseconds: 500)));
 
-  void increment() => emit(CounterState(state.counterValue + 1));
-
-  void decrement() => emit(CounterState(state.counterValue - 1));
+    on<Decrement>((event, emit) => emit(CounterState(state.counterValue - 1)));
+  }
 }
 
 class CounterScreen extends StatelessWidget {
@@ -36,14 +46,14 @@ class CounterScreen extends StatelessWidget {
           children: <Widget>[
             IconButton(
               key: const Key('increment_floatingActionButton'),
-              onPressed: () => bloc.increment(),
+              onPressed: () => bloc.add(Increment(onCompleted: () => print('Incremented'))),
               tooltip: 'Increment',
               icon: const Icon(Icons.add),
             ),
             const SizedBox(height: 10),
             IconButton(
               key: const Key('decrement_floatingActionButton'),
-              onPressed: () => bloc.decrement(),
+              onPressed: () => bloc.add(Decrement(onCompleted: () => print('Decremented'))),
               tooltip: 'Decrement',
               icon: const Icon(Icons.remove),
             ),
