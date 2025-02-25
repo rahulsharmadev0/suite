@@ -1,4 +1,4 @@
-name: Publish bloc_suite to pub.dev
+name: Publish Packages to pub.dev
 
 on:
   workflow_dispatch:
