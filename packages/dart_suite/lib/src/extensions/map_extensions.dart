@@ -3,10 +3,7 @@
 import 'package:collection/collection.dart';
 
 extension MapExtensions<K, V> on Map<K, V> {
-  /// Compare two elements for being equal.
-  bool equals(Map<K, V> other) => const DeepCollectionEquality().equals(this, other);
-
-  void removeAll(List<K> keys) => keys.forEach((key) => remove(key));
+  void removeAll(List<K> keys) => keys.forEach(remove);
 
   /// Returns a new map containing all key-value pairs in this map
   /// except those that are present in the [other] map.

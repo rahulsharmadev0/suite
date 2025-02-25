@@ -3,6 +3,7 @@ import 'dart:math' as math;
 
 const _undefined = Object();
 
+/// {@template debounce}
 /// Creates a debounced function that delays invoking `func` until after `wait`
 /// milliseconds have elapsed since the last time the debounced function was
 /// invoked. The debounced function comes with a [Debounce.cancel] method to cancel
@@ -53,6 +54,7 @@ const _undefined = Object();
 /// ```dart
 ///   final status = debounced.isPending ? "Pending..." : "Ready";
 /// ```
+/// {@endtemplate}
 class Debounce {
   /// Creates a new instance of [Debounce].
   Debounce._(
@@ -221,6 +223,8 @@ class Debounce {
 }
 
 /// TopLevel lambda to create [Debounce] functions.
+///
+/// {@macro debounce}
 Debounce debounce(
   Function func,
   Duration wait, {
@@ -238,6 +242,8 @@ Debounce debounce(
 
 extension DebounceExt on Function {
   /// Converts this into a [Debounce] function.
+  ///
+  /// {@macro debounce}
   Debounce debounced(
     Duration wait, {
     bool leading = false,

@@ -17,6 +17,7 @@ extension NullableExtension<T> on T? {
   ///
   /// ```
   ///
+  @deprecated
   R ifNotNull<R>({required R def, R Function(T value)? callback}) {
     return this != null && callback != null ? callback(this as T) : def;
   }

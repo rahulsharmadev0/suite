@@ -6,7 +6,7 @@ extension IntExt on int {
   DateTime fromUnixTime() => DateTime.fromMillisecondsSinceEpoch(this * 1000, isUtc: true);
 }
 
-extension NnmExtensions on num {
+extension NumExtensions on num {
   ///  ```
   /// void main() {
   ///   print(23.455.toRoundPrecision(1)); // Expected result: 23.5

@@ -1,17 +1,43 @@
+/// A utility class for converting strings between different cases.
+///
+/// Supported cases include:
+/// * camelCase
+/// * PascalCase
+/// * snake_case
+/// * CONSTANT_CASE
+/// * dot.case
+/// * param-case
+/// * path/case
+/// * Title Case
+/// * Sentence case
+/// * Header-Case
 class ReCase {
   final RegExp _upperAlphaRegex = RegExp(r'[A-Z]');
 
-  final symbolSet = {' ', '.', '/', '_', '\\', '-'};
+  /// {@template default_symbol_set}
+  /// Set of Default symbols used to identify word boundaries.
+  ///
+  /// This set includes:
+  /// * Space ( )
+  /// * Period (.)
+  /// * Forward slash (/)
+  /// * Underscore (_)
+  /// * Backslash (\)
+  /// * Hyphen (-)
+  /// {@endtemplate}
+  static const Set<String> defaultSymbolSet = {' ', '.', '/', '_', '\\', '-'};
 
+  final Set<String> symbolSet;
   late String originalText;
   late List<String> _words;
 
-  ReCase._(String text) {
+  ReCase._(String text, [Set<String>? symbolSet]) : symbolSet = symbolSet ?? defaultSymbolSet {
     originalText = text;
-    _words = getWords(text);
+    _words = _getWords(text);
   }
 
-  List<String> getWords(String text) {
+  /// Splits the input text into words based on case and symbols.
+  List<String> _getWords(String text) {
     StringBuffer sb = StringBuffer();
     List<String> words = [];
     bool isAllCaps = text.toUpperCase() == text;
@@ -37,34 +63,62 @@ class ReCase {
     return words;
   }
 
-  /// camelCase
+  /// {@template recase.case_format}
+  /// Converts string to camelCase.
+  ///
+  /// Example: 'foo_bar' => 'fooBar'
+  /// {@endtemplate}
   String get camelCase => getCamelCase();
 
-  /// CONSTANT_CASE
+  /// {@template recase.constant_case}
+  /// Converts string to CONSTANT_CASE.
+  ///
+  /// Example: 'fooBar' => 'FOO_BAR'
+  /// {@endtemplate}
   String get constantCase => getConstantCase();
 
-  /// Sentence case
+  /// {@template recase.sentence_case}
+  /// Converts string to Sentence case.
+  ///
+  /// Example: 'fooBar' => 'Foo bar'
+  /// {@endtemplate}
   String get sentenceCase => getSentenceCase();
 
-  /// snake_case
+  /// {@macro recase.case_format}
   String get snakeCase => getSnakeCase();
 
-  /// dot.case
+  /// {@template recase.dot_case}
+  /// Converts string to dot.case.
+  ///
+  /// Example: 'fooBar' => 'foo.bar'
+  /// {@endtemplate}
   String get dotCase => getSnakeCase(separator: '.');
 
-  /// param-case
+  /// {@template recase.param_case}
+  /// Converts string to param-case.
+  ///
+  /// Example: 'fooBar' => 'foo-bar'
+  /// {@endtemplate}
   String get paramCase => getSnakeCase(separator: '-');
 
-  /// path/case
+  /// {@template recase.path_case}
+  /// Converts string to path/case.
+  ///
+  /// Example: 'fooBar' => 'foo/bar'
+  /// {@endtemplate}
   String get pathCase => getSnakeCase(separator: '/');
 
-  /// PascalCase
+  /// {@template recase.pascal_case}
+  /// Converts string to PascalCase.
+  ///
+  /// Example: 'foo_bar' => 'FooBar'
+  /// {@endtemplate}
   String get pascalCase => getPascalCase();
 
-  /// Header-Case
+  /// {@macro recase.pascal_case}
   String get headerCase => getPascalCase(separator: '-');
 
-  /// Title Case
+  /// {@macro recase.pascal_case}
   String get titleCase => getPascalCase(separator: ' ');
 
   String getCamelCase({String separator = ''}) {
@@ -72,19 +126,16 @@ class ReCase {
     if (_words.isNotEmpty) {
       words[0] = words[0].toLowerCase();
     }
-
     return words.join(separator);
   }
 
   String getConstantCase({String separator = '_'}) {
     List<String> words = _words.map((word) => word.toUpperCase()).toList();
-
     return words.join(separator);
   }
 
   String getPascalCase({String separator = ''}) {
     List<String> words = _words.map(upperCaseFirstLetter).toList();
-
     return words.join(separator);
   }
 
@@ -93,13 +144,11 @@ class ReCase {
     if (_words.isNotEmpty) {
       words[0] = upperCaseFirstLetter(words[0]);
     }
-
     return words.join(separator);
   }
 
   String getSnakeCase({String separator = '_'}) {
     List<String> words = _words.map((word) => word.toLowerCase()).toList();
-
     return words.join(separator);
   }
 
@@ -108,8 +157,9 @@ class ReCase {
   }
 }
 
-ReCase reCase(String str) => ReCase._(str);
+//-----------------------------------------------------------------------------
 
 extension ReCaseExtension on String {
+  /// {@macro default_symbol_set}
   ReCase get reCase => ReCase._(this);
 }

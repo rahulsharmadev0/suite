@@ -1,13 +1,26 @@
 name: Publish bloc_suite to pub.dev
 
-on: [workflow_dispatch]
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - packages/bloc_suite/**
+      - packages/dart_suite/**
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
   XDG_CONFIG_HOME: ~/.config
   FLUTTER_VERSION: "3.29.0"
+  DART_SDK_VERSION: "3.7.0"
 
 jobs:
-  publish:
+  publish_bloc_suite:
+    if: contains(github.event.head_commit.modified, 'packages/bloc_suite/')
     defaults:
       run:
         working-directory: packages/bloc_suite
@@ -25,11 +38,6 @@ jobs:
           channel: "stable"
           cache: true
 
-      # - name: 🎯 Setup Dart
-      #   uses: dart-lang/setup-dart@v1
-      #   with:
-      #     sdk: "3.7.0"
-
       - name: 📦 Install Dependencies
         run: |
           flutter pub get
@@ -40,6 +48,25 @@ jobs:
 
       - name: 🧪 Run Tests
         run: flutter test
+
+      - name: 🔄 Check If Version Changed
+        id: check_version
+        run: |
+          LOCAL_VERSION=$(grep 'version:' pubspec.yaml | awk '{print $2}')
+
+          # Try fetching remote version, default to 0.0.0 if not found
+          REMOTE_VERSION=$(dart pub info bloc_suite 2>/dev/null | grep 'version:' | awk '{print $2}' || echo "0.0.0")
+
+          echo "Local version: $LOCAL_VERSION"
+          echo "Remote version: $REMOTE_VERSION"
+
+          # If package is not found, proceed with publishing
+          if [ "$REMOTE_VERSION" = "0.0.0" ]; then
+            echo "Package not found on pub.dev. Proceeding with publish."
+          elif dpkg --compare-versions "$LOCAL_VERSION" le "$REMOTE_VERSION"; then
+            echo "Local version ($LOCAL_VERSION) is not newer than remote ($REMOTE_VERSION). Skipping publish."
+            exit 0
+          fi
 
       - name: 🔐 Setup Pub Credentials
         if: success() && github.ref == 'refs/heads/main'
@@ -55,3 +82,64 @@ jobs:
       - name: 📢 Publish Package
         if: success() && github.ref == 'refs/heads/main'
         run: flutter pub publish -f
+
+  publish_dart_suite:
+    if: contains(github.event.head_commit.modified, 'packages/dart_suite/')
+    defaults:
+      run:
+        working-directory: packages/dart_suite
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📚 Git Checkout
+        uses: actions/checkout@v4
+
+      - name: 🎯 Setup Dart
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: ${{ env.DART_SDK_VERSION }}
+
+      - name: 📦 Install Dependencies
+        run: |
+          dart pub get
+
+      - name: 🔍 Run Analysis
+        run: dart analyze
+
+      - name: 🧪 Run Tests
+        run: dart test
+
+      - name: 🔄 Check If Version Changed
+        id: check_version
+        run: |
+          LOCAL_VERSION=$(grep 'version:' pubspec.yaml | awk '{print $2}')
+
+          # Try fetching remote version, default to 0.0.0 if not found
+          REMOTE_VERSION=$(dart pub info dart_suite 2>/dev/null | grep 'version:' | awk '{print $2}' || echo "0.0.0")
+
+          echo "Local version: $LOCAL_VERSION"
+          echo "Remote version: $REMOTE_VERSION"
+
+          # If package is not found, proceed with publishing
+          if [ "$REMOTE_VERSION" = "0.0.0" ]; then
+            echo "Package not found on pub.dev. Proceeding with publish."
+          elif dpkg --compare-versions "$LOCAL_VERSION" le "$REMOTE_VERSION"; then
+            echo "Local version ($LOCAL_VERSION) is not newer than remote ($REMOTE_VERSION). Skipping publish."
+            exit 0
+          fi
+
+      - name: 🔐 Setup Pub Credentials
+        if: success() && github.ref == 'refs/heads/main'
+        run: |
+          mkdir -p "$XDG_CONFIG_HOME/dart"
+          echo '${{ secrets.PUB_CREDENTIALS }}' > "$XDG_CONFIG_HOME/dart/pub-credentials.json"
+          ls -l "$XDG_CONFIG_HOME/dart"
+
+      - name: 🎯 Verify Package
+        if: success()
+        run: dart pub publish --dry-run
+
+      - name: 📢 Publish Package
+        if: success() && github.ref == 'refs/heads/main'
+        run: dart pub publish -f

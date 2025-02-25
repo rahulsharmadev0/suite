@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:math' as math;
 import 'package:crypto/crypto.dart' as crypto;
-import 'package:collection/collection.dart';
 
 extension NullableIterableGettersExtensions<T> on Iterable<T?> {
   Iterable<T> get nonNulls {
@@ -22,9 +21,6 @@ extension NullableIterableGettersExtensions<T> on Iterable<T?> {
 }
 
 extension IterableExtensions<T> on Iterable<T> {
-  /// Compare two elements for being equal.
-  bool equals(Iterable<T> other) => DeepCollectionEquality().equals(this, other);
-
   /// Returns the number of elements that matches the [test].\
   /// If not [test] is specified it will count every element.\
   /// Example:
@@ -44,14 +40,6 @@ extension IterableExtensions<T> on Iterable<T> {
       if (contains(e)) return true;
     }
     return false;
-  }
-
-  /// The first element satisfying [test], or `null` if there are none.
-  T? firstWhereOrNull(bool Function(T element) test) {
-    for (var element in this) {
-      if (test(element)) return element;
-    }
-    return null;
   }
 
   /// Returns true if every element in [other] also exists in [this].
