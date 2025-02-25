@@ -12,7 +12,6 @@ version: 0.0.2
 environment:
   sdk: ^3.7.0
 
-# Add regular dependencies here.
 dependencies:
   flutter:
     sdk: flutter
