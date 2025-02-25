@@ -6,8 +6,8 @@ on:
     branches:
       - main
     paths:
-      - packages/bloc_suite/**
-      - packages/dart_suite/**
+      - "packages/bloc_suite/**"
+      - "packages/dart_suite/**"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
