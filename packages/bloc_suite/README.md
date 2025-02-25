@@ -1,4 +1,18 @@
-# Bloc Suite
+<p align="center">
+<img src="https://raw.githubusercontent.com/rahulsharmadev0/suite/refs/heads/main/assets/logo/bg_bloc_suite.png" height="100" alt="Flutter Bloc Package" />
+</p>
+
+<p align="center">
+<a href="https://pub.dev/packages/bloc_suite"><img src="https://img.shields.io/pub/v/bloc_suite.svg" alt="Pub"></a>
+<a href="https://github.com/rahulsharmadev0/bloc/actions"><img src="https://github.com/felangel/bloc/workflows/build/badge.svg" alt="build"></a>
+<a href="https://github.com/rahulsharmadev0/suite"><img src="https://img.shields.io/github/stars/rahulsharmadev0/suite.svg?style=flat&logo=github&colorB=deeppink&label=stars" alt="Star on Github"></a>
+<a href="https://flutter.dev/docs/development/data-and-backend/state-mgmt/options#bloc--rx"><img src="https://img.shields.io/badge/flutter-website-deepskyblue.svg" alt="Flutter Website"></a>
+<a href="https://fluttersamples.com"><img src="https://img.shields.io/badge/flutter-samples-teal.svg?longCache=true" alt="Flutter Samples"></a>
+<a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/license-MIT-purple.svg" alt="License: MIT"></a>
+<a href="https://github.com/felangel/bloc"><img src="https://tinyurl.com/bloc-library" alt="Bloc Library"></a>
+</p>
+
+---
 
 Bloc Suite is a comprehensive package that extends the functionality of the Flutter Bloc library. It provides additional utilities, widgets, and patterns to simplify state management in Flutter applications.
 
@@ -491,21 +505,10 @@ void main() {
 }
 ```
 
-## Installation
-
-Add `bloc_suite` to your `pubspec.yaml`:
-
-```yaml
-dependencies:
-  bloc_suite: <latest_version>
-```
-
-Then run `flutter pub get` to install the package.
-
 ## Contributing
 
-Contributions are welcome! Please open an issue or submit a pull request on GitHub.
+Contributions are welcome! Please open an issue or submit a pull request on [GitHub](https://github.com/rahulsharmadev0/suite).
 
 ## License
 
-This project is licensed under the MIT License.
+This project is licensed under the [MIT License](https://github.com/rahulsharmadev0/suite/blob/main/packages/bloc_suite/LICENSE).
