@@ -19,8 +19,39 @@ env:
   DART_SDK_VERSION: "3.7.0"
 
 jobs:
+  detect_changes:
+    runs-on: ubuntu-latest
+    outputs:
+      bloc_suite_changed: ${{ steps.check_changes.outputs.bloc_suite_changed }}
+      dart_suite_changed: ${{ steps.check_changes.outputs.dart_suite_changed }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Check for package changes
+        id: check_changes
+        run: |
+          CHANGED_FILES=$(git diff --name-only HEAD^ HEAD)
+          echo "Changed files:"
+          echo "$CHANGED_FILES"
+
+          if echo "$CHANGED_FILES" | grep -q "packages/bloc_suite/"; then
+            echo "bloc_suite_changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "bloc_suite_changed=false" >> $GITHUB_OUTPUT
+          fi
+
+          if echo "$CHANGED_FILES" | grep -q "packages/dart_suite/"; then
+            echo "dart_suite_changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "dart_suite_changed=false" >> $GITHUB_OUTPUT
+          fi
+
   publish_bloc_suite:
-    if: contains(github.event.head_commit.modified, 'packages/bloc_suite/')
+    needs: detect_changes
+    if: needs.detect_changes.outputs.bloc_suite_changed == 'true'
     defaults:
       run:
         working-directory: packages/bloc_suite
@@ -84,7 +115,8 @@ jobs:
         run: flutter pub publish -f
 
   publish_dart_suite:
-    if: contains(github.event.head_commit.modified, 'packages/dart_suite/')
+    needs: detect_changes
+    if: needs.detect_changes.outputs.dart_suite_changed == 'true'
     defaults:
       run:
         working-directory: packages/dart_suite
