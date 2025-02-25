@@ -1,4 +1,5 @@
 name: bloc_suite
+version: 0.0.2
 description: Bloc Suite is a comprehensive package that extends the functionality of the Flutter Bloc library.
 maintainer: Rahul Sharma (@rahulsharmadev)
 homepage: https://github.com/rahulsharmadev0
@@ -6,8 +7,6 @@ repository: https://github.com/rahulsharmadev0/suite/tree/main/packages/bloc_sui
 issue_tracker: https://github.com/rahulsharmadev0/suite/issues
 documentation: https://github.com/rahulsharmadev0/suite/blob/main/packages/bloc_suite/README.md
 topics: [bloc, concurrency, state-management]
-
-version: 0.0.2
 
 environment:
   sdk: ^3.7.0

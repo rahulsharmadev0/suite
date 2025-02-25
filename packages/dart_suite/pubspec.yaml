@@ -1,6 +1,7 @@
 name: dart_suite
-description: A set of utility libraries for Dart that makes using many Dart libraries easier and more convenient, or adds additional functionality.
 version: 0.0.1
+description: A set of utility libraries for Dart that makes using many Dart libraries easier and more convenient, or adds additional functionality.
+
 maintainer: Rahul Sharma (@rahulsharmadev)
 homepage: https://github.com/rahulsharmadev0
 repository: https://github.com/rahulsharmadev0/suite/tree/main/packages/dart_suite
@@ -27,3 +28,7 @@ dependencies:
 dev_dependencies:
   lints: ^4.0.0
   test: ^1.24.0
+
+screenshots:
+  - description: The dart_suite package logo.
+    path: screenshots/logo.png
