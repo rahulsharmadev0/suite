@@ -1,4 +1,0 @@
-
-extension DoubleExtensions on double {
-
-}

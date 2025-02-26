@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:collection/collection.dart';
+
 extension StringExtensions on String {
   bool get isNotBlank => trim().isNotEmpty;
   bool get isBlank => trim().isEmpty;
@@ -105,11 +107,28 @@ extension StringExtensions on String {
     return path + list.join();
   }
 
-  List<String> get toList => split('');
+  List<String> get toList => runes.map((r) => String.fromCharCode(r)).toList();
 
-  List<String> get toReversedList => split('').reversed.toList();
+  List<String> get toReversedList => reversed.toList;
 
-  String get reversed => split('').reversed.join('');
+  /// Returns [this] with characters in reverse order.
+  ///
+  /// Example:
+  /// ```dart
+  /// 'word'.reversed; // 'drow'
+  /// ```
+  ///
+  /// WARNING: This is the naive-est possible implementation, relying on native
+  /// string indexing. Therefore, this method is almost guaranteed to exhibit
+  /// unexpected behavior for non-ASCII characters.
+  String get reversed {
+    final stringBuffer = StringBuffer();
+    for (var i = length - 1; i >= 0; i--) {
+      stringBuffer.write(this[i]);
+    }
+
+    return stringBuffer.toString();
+  }
 
   /// A palindrome is a sequence of characters that reads the same forwards and backwards
   /// when ignoring spaces, non-alphanumeric characters, and considering letter casing.

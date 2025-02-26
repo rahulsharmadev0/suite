@@ -45,6 +45,18 @@ extension IterableExtensions<T> on Iterable<T> {
   /// Returns true if every element in [other] also exists in [this].
   ///
   /// Example:
+  /// ```dart
+  /// [1, 2, 3].containsAll([1, 2]); // true
+  /// [1, 2].containsAll([1, 2, 3]); // false
+  /// ```
+  ///
+  /// If [collapseDuplicates] is true, only the presence of a value will be
+  /// considered, not the number of times it occurs. If [collapseDuplicates] is
+  /// false, the number of occurrences of a given value in [this] must be
+  /// greater than or equal to the number of occurrences of that value in
+  /// [other] for the result to be true.
+  ///
+  /// Example:
   /// ```
   /// [1, 2, 3].containsAll([1, 1, 1, 2]); // true
   /// [1, 2, 3].containsAll([1, 1, 1, 2], collapseDuplicates: false); // false

@@ -1,5 +1,3 @@
-library;
-
 export 'utility/validator/validator_mixin.dart';
 export 'utility/guard.dart';
 export 'utility/typedef.dart';

@@ -2,9 +2,11 @@ import 'dart:async';
 import 'dart:math';
 import 'package:intl/intl.dart' as intl;
 
-extension IntExt on int {
+extension IntExtensions on int {
   DateTime fromUnixTime() => DateTime.fromMillisecondsSinceEpoch(this * 1000, isUtc: true);
 }
+
+extension DoubleExtensions on double {}
 
 extension NumExtensions on num {
   ///  ```
