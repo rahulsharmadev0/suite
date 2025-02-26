@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:collection/collection.dart';
 
 extension StringExtensions on String {
   bool get isNotBlank => trim().isNotEmpty;
