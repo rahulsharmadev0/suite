@@ -58,7 +58,8 @@ class _Undo extends ReplayEvent {
 /// * [Bloc] for information about the [ReplayBloc] superclass.
 ///
 /// {@endtemplate}
-abstract class ReplayBloc<Event extends ReplayEvent, State> extends Bloc<Event, State>
+abstract class ReplayBloc<Event extends ReplayEvent, State>
+    extends Bloc<Event, State>
     with ReplayBlocMixin<Event, State> {
   /// {@macro replay_bloc}
   ReplayBloc(super.state, {int? limit}) {
@@ -116,11 +117,7 @@ mixin ReplayBlocMixin<Event extends ReplayEvent, State> on Bloc<Event, State> {
           final event = _Undo();
           onEvent(event);
           onTransition(
-            Transition(
-              currentState: this.state,
-              event: event,
-              nextState: val,
-            ),
+            Transition(currentState: this.state, event: event, nextState: val),
           );
           // ignore: invalid_use_of_visible_for_testing_member
           super.emit(val);

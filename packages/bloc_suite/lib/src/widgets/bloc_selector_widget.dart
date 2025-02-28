@@ -46,14 +46,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 /// **Note: The widget will automatically close the manually provided [bloc] during disposal
 /// unless [autoClose] is set to false.**
 /// {@endtemplate}
-abstract class BlocSelectorWidget<B extends StateStreamableSource<S>, S, T> extends StatefulWidget {
+abstract class BlocSelectorWidget<B extends StateStreamableSource<S>, S, T>
+    extends StatefulWidget {
   /// {@macro bloc_selector_widget}
   const BlocSelectorWidget({
     required T Function(S) selector,
     super.key,
     B? bloc,
-  })  : _bloc = bloc,
-        _selector = selector;
+  }) : _bloc = bloc,
+       _selector = selector;
 
   /// The [_bloc] that the [BlocSelector] will interact with.
   /// If omitted, [BlocSelector] will automatically perform a lookup using
@@ -72,14 +73,17 @@ abstract class BlocSelectorWidget<B extends StateStreamableSource<S>, S, T> exte
   Widget build(BuildContext context, B bloc, T state);
 
   @override
-  State<BlocSelectorWidget<B, S, T>> createState() => _BlocSelectorStateWidget<B, S, T>();
+  State<BlocSelectorWidget<B, S, T>> createState() =>
+      _BlocSelectorStateWidget<B, S, T>();
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
     properties
       ..add(DiagnosticsProperty<B?>('bloc', _bloc))
-      ..add(ObjectFlagProperty<BlocWidgetSelector<S, T>>.has('selector', _selector));
+      ..add(
+        ObjectFlagProperty<BlocWidgetSelector<S, T>>.has('selector', _selector),
+      );
   }
 }
 

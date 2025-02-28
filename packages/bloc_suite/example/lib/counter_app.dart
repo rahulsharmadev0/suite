@@ -23,8 +23,10 @@ class Decrement extends CounterEvent {
 // Bloc
 class CounterBloc extends LifecycleBloc<CounterEvent, CounterState> {
   CounterBloc() : super(CounterState(0)) {
-    on<Increment>((event, emit) async => emit(CounterState(state.counterValue + 1)),
-        transformer: BlocEventTransformer.throttle(const Duration(milliseconds: 500)));
+    on<Increment>(
+        (event, emit) async => emit(CounterState(state.counterValue + 1)),
+        transformer:
+            BlocEventTransformer.debounce(const Duration(milliseconds: 500)));
 
     on<Decrement>((event, emit) => emit(CounterState(state.counterValue - 1)));
   }
@@ -46,14 +48,16 @@ class CounterScreen extends StatelessWidget {
           children: <Widget>[
             IconButton(
               key: const Key('increment_floatingActionButton'),
-              onPressed: () => bloc.add(Increment(onCompleted: () => print('Incremented'))),
+              onPressed: () =>
+                  bloc.add(Increment(onCompleted: () => print('Incremented'))),
               tooltip: 'Increment',
               icon: const Icon(Icons.add),
             ),
             const SizedBox(height: 10),
             IconButton(
               key: const Key('decrement_floatingActionButton'),
-              onPressed: () => bloc.add(Decrement(onCompleted: () => print('Decremented'))),
+              onPressed: () =>
+                  bloc.add(Decrement(onCompleted: () => print('Decremented'))),
               tooltip: 'Decrement',
               icon: const Icon(Icons.remove),
             ),

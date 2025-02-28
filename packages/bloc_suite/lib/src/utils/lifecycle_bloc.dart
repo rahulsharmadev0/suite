@@ -92,7 +92,8 @@ abstract class LifecycleEvent {
 /// )
 /// ```
 ///{@endtemplate}
-abstract class LifecycleBloc<Event extends LifecycleEvent, State> extends Bloc<Event, State> {
+abstract class LifecycleBloc<Event extends LifecycleEvent, State>
+    extends Bloc<Event, State> {
   /// {@macro LifecycleBloc}
   LifecycleBloc(super.initialState);
 
@@ -122,11 +123,16 @@ abstract class LifecycleBloc<Event extends LifecycleEvent, State> extends Bloc<E
   /// The provided [transformer] is combined with the internal callback transformer
   /// to ensure both custom transformation and lifecycle callbacks work together.
   @override
-  void on<E extends Event>(EventHandler<E, State> handler, {EventTransformer<E>? transformer}) {
+  void on<E extends Event>(
+    EventHandler<E, State> handler, {
+    EventTransformer<E>? transformer,
+  }) {
     final EventTransformer<E> mergedTransformer =
         transformer != null
-            ? (events, mapper) =>
-                transformer(events, (e) => _callbackTransformer<E>()(Stream.value(e), mapper))
+            ? (events, mapper) => transformer(
+              events,
+              (e) => _callbackTransformer<E>()(Stream.value(e), mapper),
+            )
             : _callbackTransformer<E>();
 
     super.on<E>(handler, transformer: mergedTransformer);

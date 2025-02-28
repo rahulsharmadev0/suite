@@ -34,16 +34,26 @@ void main() {
     });
 
     test('logs transition when printTransitions is enabled', () {
-      final transition = Transition(currentState: 'StateA', event: 'EventA', nextState: 'StateB');
+      final transition = Transition(
+        currentState: 'StateA',
+        event: 'EventA',
+        nextState: 'StateB',
+      );
 
       observer.onTransition(mockBloc, transition);
       verify(() => mockLogger.i(any())).called(1);
     });
 
     test('does not log transition when printTransitions is disabled', () {
-      final transition = Transition(currentState: 'StateA', event: 'EventA', nextState: 'StateB');
+      final transition = Transition(
+        currentState: 'StateA',
+        event: 'EventA',
+        nextState: 'StateB',
+      );
 
-      observer.copyWith(printTransitions: false).onTransition(mockBloc, transition);
+      observer
+          .copyWith(printTransitions: false)
+          .onTransition(mockBloc, transition);
       verifyNever(() => mockLogger.i(any()));
     });
 
@@ -52,7 +62,9 @@ void main() {
       final stackTrace = StackTrace.current;
 
       observer.onError(mockBloc, error, stackTrace);
-      verify(() => mockLogger.e(any(), error: error, stackTrace: stackTrace)).called(1);
+      verify(
+        () => mockLogger.e(any(), error: error, stackTrace: stackTrace),
+      ).called(1);
     });
 
     test('logs creation when printCreations is enabled', () {
@@ -76,14 +88,22 @@ void main() {
     });
 
     test('respects transitionFilter', () {
-      final transition = Transition(currentState: 'StateA', event: 'EventA', nextState: 'StateB');
+      final transition = Transition(
+        currentState: 'StateA',
+        event: 'EventA',
+        nextState: 'StateB',
+      );
       transitionFilter(bloc, transition) => false;
-      observer.copyWith(transitionFilter: transitionFilter).onTransition(mockBloc, transition);
+      observer
+          .copyWith(transitionFilter: transitionFilter)
+          .onTransition(mockBloc, transition);
       verifyNever(() => mockLogger.i(any()));
     });
 
     test('respects eventFilter', () {
-      observer.copyWith(eventFilter: (bloc, event) => false).onEvent(mockBloc, 'TestEvent');
+      observer
+          .copyWith(eventFilter: (bloc, event) => false)
+          .onEvent(mockBloc, 'TestEvent');
       verifyNever(() => mockLogger.i(any()));
     });
   });

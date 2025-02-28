@@ -25,7 +25,9 @@ final class FlutterBlocObserver extends BlocObserver {
     this.transitionFilter,
     this.eventFilter,
     Logger? logger,
-  }) : _logger = logger ?? Logger(printer: PrettyPrinter(methodCount: 0, printEmojis: false));
+  }) : _logger =
+           logger ??
+           Logger(printer: PrettyPrinter(methodCount: 0, printEmojis: false));
 
   @override
   void onEvent(Bloc bloc, Object? event) {
@@ -50,25 +52,38 @@ final class FlutterBlocObserver extends BlocObserver {
   @override
   void onChange(BlocBase bloc, Change change) {
     super.onChange(bloc, change);
-    _logIfEnabled(condition: printChanges, message: _formatChange(bloc, change));
+    _logIfEnabled(
+      condition: printChanges,
+      message: _formatChange(bloc, change),
+    );
   }
 
   @override
   void onError(BlocBase bloc, Object error, StackTrace stackTrace) {
     super.onError(bloc, error, stackTrace);
-    _logIfEnabled(message: '🚫 ${bloc.runtimeType} Error', error: error, stackTrace: stackTrace);
+    _logIfEnabled(
+      message: '🚫 ${bloc.runtimeType} Error',
+      error: error,
+      stackTrace: stackTrace,
+    );
   }
 
   @override
   void onCreate(BlocBase bloc) {
     super.onCreate(bloc);
-    _logIfEnabled(condition: printCreations, message: '🔓 ${bloc.runtimeType} Created');
+    _logIfEnabled(
+      condition: printCreations,
+      message: '🔓 ${bloc.runtimeType} Created',
+    );
   }
 
   @override
   void onClose(BlocBase bloc) {
     super.onClose(bloc);
-    _logIfEnabled(condition: printClosings, message: '🔒 ${bloc.runtimeType} Closed');
+    _logIfEnabled(
+      condition: printClosings,
+      message: '🔒 ${bloc.runtimeType} Closed',
+    );
   }
 
   void _logIfEnabled({
@@ -79,10 +94,13 @@ final class FlutterBlocObserver extends BlocObserver {
     StackTrace? stackTrace,
   }) {
     if (!enabled || !condition || !filter) return;
-    error != null ? _logger.e(message, error: error, stackTrace: stackTrace) : _logger.i(message);
+    error != null
+        ? _logger.e(message, error: error, stackTrace: stackTrace)
+        : _logger.i(message);
   }
 
-  String _formatEvent(Bloc bloc, Object? event) => '📩 ${bloc.runtimeType} Event: $event}';
+  String _formatEvent(Bloc bloc, Object? event) =>
+      '📩 ${bloc.runtimeType} Event: $event}';
 
   String _formatTransition(Bloc bloc, Transition transition) {
     return '''🔄 ${bloc.runtimeType} Transition:

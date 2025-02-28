@@ -34,7 +34,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 /// **Note: The widget will automatically close the manually provided [bloc] during disposal
 /// unless [autoClose] is set to false.**
 /// {@endtemplate}
-abstract class BlocWidget<B extends StateStreamableSource<S>, S> extends StatefulWidget {
+abstract class BlocWidget<B extends StateStreamableSource<S>, S>
+    extends StatefulWidget {
   /// {@macro bloc_builder_base}
   const BlocWidget({super.key, B? bloc, bool Function(S, S)? buildWhen})
     : _buildWhen = buildWhen,
@@ -59,12 +60,18 @@ abstract class BlocWidget<B extends StateStreamableSource<S>, S> extends Statefu
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
     properties
-      ..add(ObjectFlagProperty<BlocBuilderCondition<S>?>.has('buildWhen', _buildWhen))
+      ..add(
+        ObjectFlagProperty<BlocBuilderCondition<S>?>.has(
+          'buildWhen',
+          _buildWhen,
+        ),
+      )
       ..add(DiagnosticsProperty<B?>('bloc', _bloc));
   }
 }
 
-class _BlocWidgetState<B extends StateStreamableSource<S>, S> extends State<BlocWidget<B, S>> {
+class _BlocWidgetState<B extends StateStreamableSource<S>, S>
+    extends State<BlocWidget<B, S>> {
   late B _bloc;
   late S _state;
 

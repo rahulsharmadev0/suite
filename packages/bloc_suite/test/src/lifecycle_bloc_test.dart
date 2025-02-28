@@ -19,8 +19,14 @@ class CounterBloc extends LifecycleBloc<CounterEvent, int> {
     EventTransformer<Increment>? incrementTransformer,
     EventTransformer<Decrement>? decrementTransformer,
   ]) : super(0) {
-    on<Increment>((event, emit) async => emit(state + 1), transformer: incrementTransformer);
-    on<Decrement>((event, emit) async => emit(state - 1), transformer: decrementTransformer);
+    on<Increment>(
+      (event, emit) async => emit(state + 1),
+      transformer: incrementTransformer,
+    );
+    on<Decrement>(
+      (event, emit) async => emit(state - 1),
+      transformer: decrementTransformer,
+    );
   }
   void reset() => emit(0);
 }
@@ -90,14 +96,20 @@ void main() {
 
       counterBloc.add(Increment());
       await Future.delayed(delay ~/ 2);
-      expect(counterBloc.state, equals(0)); // Should still be 0 before delay completes
+      expect(
+        counterBloc.state,
+        equals(0),
+      ); // Should still be 0 before delay completes
 
       await Future.delayed(delay);
       expect(counterBloc.state, equals(1)); // Should be 1 after delay
 
       counterBloc.add(Decrement());
       await Future.delayed(delay ~/ 2);
-      expect(counterBloc.state, equals(1)); // Should still be 1 before delay completes
+      expect(
+        counterBloc.state,
+        equals(1),
+      ); // Should still be 1 before delay completes
 
       await Future.delayed(delay);
       expect(counterBloc.state, equals(0)); // Should be 0 after delay
@@ -112,14 +124,20 @@ void main() {
 
       counterBloc.add(Increment());
       await Future.delayed(debounce ~/ 2);
-      expect(counterBloc.state, equals(0)); // Should still be 0 before debounce completes
+      expect(
+        counterBloc.state,
+        equals(0),
+      ); // Should still be 0 before debounce completes
 
       await Future.delayed(debounce);
       expect(counterBloc.state, equals(1)); // Should be 1 after debounce
 
       counterBloc.add(Decrement());
       await Future.delayed(debounce ~/ 2);
-      expect(counterBloc.state, equals(1)); // Should still be 1 before debounce completes
+      expect(
+        counterBloc.state,
+        equals(1),
+      ); // Should still be 1 before debounce completes
 
       await Future.delayed(debounce);
       expect(counterBloc.state, equals(0)); // Should be 0 after debounce

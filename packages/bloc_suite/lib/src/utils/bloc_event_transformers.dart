@@ -2,100 +2,326 @@
 import 'package:bloc/bloc.dart';
 import 'package:rxdart/rxdart.dart';
 
-class BlocEventTransformer {
-  /// The delay() transformer is pausing adding events for a particular
-  /// increment of time (that you specify) before emitting each of the events.
-  /// This has the effect of shifting the entire sequence of
-  /// events added to the bloc forward in time by that specified increment.
+// Extension providing utility methods for Stream<E> to simplify transformer implementation
+extension _UtilityExt<E> on Stream<E> {
+  // Apply distinctness to an event stream if requested
+  Stream<E> applyDistinct(bool distinct) => distinct ? this.distinct() : this;
+
+  // Apply sequential or parallel processing based on condition
+  Stream<T> applySequential<T>(bool condition, Stream<T> Function(E) mapper) =>
+      condition ? asyncExpand(mapper) : flatMap(mapper);
+}
+
+/// A utility class providing various event transformers for Bloc pattern.
+///
+/// Event transformers modify how events are processed before they reach the event handler.
+/// They can be used to control timing, filtering, or sequencing of events.
+///
+/// ## Choosing the Right BlocEventTransformer
+///
+/// | Transformer    | Sequential Processing | `distinct` Support | Best Use Case |
+/// |---------------|----------------------|--------------------|------------------------------------------------|
+/// | **`delay`**       | ✅ Always | 🔄 Configurable | Postpone processing (e.g., brief loading indicators). |
+/// | **`debounce`**    | ✅ Always | 🔄 Configurable | Wait for inactivity before processing (e.g., search inputs, form validation). |
+/// | **`throttle`**    | ✅ Always | 🔄 Configurable | Control frequent events (e.g., scrolling, resizing). |
+/// | **`restartable`** | ✅ Always | 🔄 Configurable | Cancel outdated events when new ones arrive (e.g., live search API calls). |
+/// | **`sequential`**  | ✅ Always | 🔄 Configurable | Ensure ordered execution (e.g., sending messages one by one). |
+/// | **`droppable`**   | ✅ Always | 🔄 Configurable | Process only the latest event, dropping older ones (e.g., UI animations). |
+/// | **`skip`**        | 🔄 Configurable | 🔄 Configurable | Ignore initial events (e.g., first trigger in a lifecycle). |
+/// | **`distinct`**    | 🔄 Configurable | ✅ Always | Avoid duplicate event processing (e.g., filtering unchanged user actions). |
+/// | **`take`** | 🔄 Configurable | 🔄 Configurable | Limit the number of events (e.g., first N items in a list). |
+///
+abstract class BlocEventTransformer<E> {
+  /// The delay() transformer pauses adding events for a specified duration
+  /// before emitting each event, shifting the entire sequence forward in time.
   ///
   /// [Interactive marble diagram](http://rxmarbles.com/#delay)
   ///
-  /// ### Example
+  /// **Example**
+  /// ```dart
+  /// on<ExampleEvent>(
+  ///   _handleEvent,
+  ///   transformer: BlocEventTransformer.delay(const Duration(seconds: 1)),
+  /// );
+  /// ```
   ///
-  ///     on<ExampleEvent>(
-  ///       _handleEvent,
-  ///       transformer: delay(const Duration(seconds: 1)),
-  ///     );
-  static EventTransformer<Event> delay<Event>(Duration duration) =>
-      (events, mapper) => events.delay(duration).switchMap(mapper);
+  /// **Visual Representation:**
+  ///
+  /// ```
+  /// Input:  --a--------b---c--->
+  /// Output: ----a--------b---c->  (with 1s delay)
+  /// ```
+  ///
+  /// - [duration] The time to delay each event
+  /// - [distinct] When true, skips events that are equal to the previous event
+  ///
+  /// Returns an [EventTransformer] that delays events by the specified duration.
+  static EventTransformer<Event> delay<Event>(
+    Duration duration, {
+    bool distinct = false,
+  }) {
+    return (events, mapper) =>
+        events.applyDistinct(distinct).delay(duration).switchMap(mapper);
+  }
 
-  /// Event transformer that will only emit items from the source
-  /// sequence whenever the time span defined by [duration] passes, without the
-  /// source sequence emitting another item.
+  /// Emits items from the source sequence only when there's a pause in events
+  /// for the specified duration.
   ///
-  /// This time span start after the last debounced event was emitted.
-  ///
-  /// debounce filters out items obtained events that are
-  /// rapidly followed by another emitted event.
+  /// This transformer is ideal for search inputs or form validation where you want
+  /// to wait for the user to stop typing before processing.
   ///
   /// [Interactive marble diagram](http://rxmarbles.com/#debounceTime)
   ///
-  /// ### Example
+  /// **Example:**
   ///
-  ///     on<ExampleEvent>(
-  ///       _handleEvent,
-  ///       transformer: debounce(const Duration(seconds: 1)),
-  ///     );
-  static EventTransformer<Event> debounce<Event>(Duration duration) =>
-      (events, mapper) => events.debounceTime(duration).switchMap(mapper);
+  /// ```dart
+  /// on<SearchQueryEvent>(
+  ///   _handleSearchQuery,
+  ///   transformer: BlocEventTransformer.debounce(const Duration(milliseconds: 300)),
+  /// );
+  /// ```
+  ///
+  /// **Visual Representation:**
+  ///
+  /// ```
+  /// Input:  --a-ab-bc--c------d->
+  /// Output: --------c---------d->  (with 300ms debounce)
+  /// ```
+  ///
+  /// - [duration] The time window to wait for inactivity
+  /// - [distinct] When true, skips events that are equal to the previous event
+  ///
+  /// Returns an [EventTransformer] that debounces events by the specified duration.
+  static EventTransformer<Event> debounce<Event>(
+    Duration duration, {
+    bool distinct = false,
+  }) {
+    return (events, mapper) =>
+        events.applyDistinct(distinct).debounceTime(duration).switchMap(mapper);
+  }
 
-  /// Skips the first [count] events.
+  /// Skips the first [count] events before processing any.
   ///
-  /// ### Example
+  /// Useful for ignoring initial events such as initialization triggers.
   ///
-  ///     on<ExampleEvent>(
-  ///       _handleEvent,
-  ///       transformer: skip(10),
-  ///     )
+  /// **Example:**
   ///
+  /// ```dart
+  /// on<PageLoadEvent>(
+  ///   _handlePageLoad,
+  ///   transformer: BlocEventTransformer.skip(1), // Skip first event
+  /// );
+  /// ```
   ///
-  static EventTransformer<Event> skip<Event>(int count) =>
-      (events, mapper) => events.skip(count).flatMap(mapper);
+  /// **Visual Representation:**
+  ///
+  /// ```
+  /// Input:  --a--b--c--d--e-->
+  /// Output: -----b--c--d--e-->  (with count: 1)
+  /// ```
+  ///
+  /// - [count] The number of events to skip
+  /// - [distinct] When true, skips events that are equal to the previous event
+  /// - [sequential] When true, processes events one at a time in order
+  ///
+  /// Returns an [EventTransformer] that skips the specified number of events.
+  static EventTransformer<Event> skip<Event>(
+    int count, {
+    bool distinct = false,
+    bool sequential = false,
+  }) {
+    return (events, mapper) => events
+        .applyDistinct(distinct)
+        .skip(count)
+        .applySequential(sequential, mapper);
+  }
 
-  /// Skips the first [count] events.
+  /// Limits the rate at which events are processed.
   ///
-  /// ### Example
+  /// Throttling ensures that events are emitted at most once per specified duration.
   ///
-  ///     on<ExampleEvent>(
-  ///       _handleEvent,
-  ///       transformer: skip(10),
-  ///     )
+  /// **Example:**
+  ///
+  /// ```dart
+  /// on<ScrollEvent>(
+  ///   _handleScrollEvent,
+  ///   transformer: BlocEventTransformer.throttle(
+  ///     const Duration(milliseconds: 200),
+  ///     trailing: true, // Process the last event in a burst
+  ///   ),
+  /// );
+  /// ```
+  ///
+  /// **Visual Representation:**
+  /// ```
+  /// Input:  --a-ab-bc--c-------d-->
+  /// Output: --a----b----c-------d->  (with 200ms throttle, leading: true)
+  /// ```
+  ///
+  /// - [duration] The minimum time between processed events
+  /// - [trailing] If true, process the last event in a burst (default: false)
+  /// - [leading] If true, process the first event in a burst (default: true)
+  /// - [distinct] When true, skips events that are equal to the previous event
+  ///
+  /// Returns an [EventTransformer] that throttles events by the specified duration.
   static EventTransformer<Event> throttle<Event>(
     Duration duration, {
     bool trailing = false,
     bool leading = true,
-  }) =>
-      (events, mapper) =>
-          events.throttleTime(duration, trailing: trailing, leading: leading).switchMap(mapper);
-
-  /// Process only one event by cancelling any pending events and
-  /// processing the new event immediately.
-  ///
-  /// Avoid using [restartable] if you expect an event to have
-  /// immediate results -- it should only be used with asynchronous APIs.
-  ///
-  /// **Note**: there is no event handler overlap and any currently running tasks
-  /// will be aborted if a new event is added before a prior one completes.
-  static EventTransformer<Event> restartable<Event>() {
-    return (events, mapper) => events.switchMap(mapper);
+    bool distinct = false,
+  }) {
+    return (events, mapper) => events
+        .applyDistinct(distinct)
+        .throttleTime(duration, trailing: trailing, leading: leading)
+        .switchMap(mapper);
   }
 
-  /// Process events one at a time by maintaining a queue of added events
-  /// and processing the events sequentially.
+  /// Cancels processing of the current event if a new event arrives.
   ///
-  /// **Note**: there is no event handler overlap and every event is guaranteed
-  /// to be handled in the order it was received.
-  static EventTransformer<Event> sequential<Event>() {
-    return (events, mapper) => events.asyncExpand(mapper);
+  /// This transformer is ideal for network requests or other async operations
+  /// that should be cancelled when newer data is requested.
+  ///
+  /// **Note**: Avoid using this with synchronous operations as it may cause unexpected behavior.
+  ///
+  /// **Example:**
+  /// ```dart
+  /// on<FetchDataEvent>(
+  ///   _handleFetchData,
+  ///   transformer: BlocEventTransformer.restartable(),
+  /// );
+  /// ```
+  ///
+  /// **Visual Representation:**
+  /// ```
+  /// Input:     --a-----b---c--->
+  /// Processing: --[a]--X
+  ///                  --[b]X
+  ///                      --[c]--->
+  /// Output:     ---------x----x--->
+  /// ```
+  ///
+  /// - [distinct] When true, skips events that are equal to the previous event
+  ///
+  /// Returns an [EventTransformer] that cancels current processing when a new event arrives.
+  static EventTransformer<Event> restartable<Event>({bool distinct = false}) {
+    return (events, mapper) => events.applyDistinct(distinct).switchMap(mapper);
   }
 
-  /// Process only one event and ignore (drop) any new events
-  /// until the current event is done.
+  /// Processes events one at a time in a queue, ensuring order is preserved.
   ///
-  /// **Note**: dropped events never trigger the event handler.
-  static EventTransformer<Event> droppable<Event>() {
-    return (events, mapper) {
-      return events.exhaustMap(mapper);
-    };
+  /// This transformer maintains a queue of events and processes them sequentially,
+  /// waiting for each operation to complete before starting the next one.
+  ///
+  /// **Example:**
+  /// ```dart
+  /// on<SaveDataEvent>(
+  ///   _handleSaveData,
+  ///   transformer: BlocEventTransformer.sequential(),
+  /// );
+  /// ```
+  ///
+  /// **Visual Representation:**
+  /// ```
+  /// Input:     --a--b--c-------->
+  /// Processing: --[a]--[b]--[c]-->
+  /// Output:     ----x----x----x-->
+  /// ```
+  ///
+  /// - [distinct] When true, skips events that are equal to the previous event
+  ///
+  /// Returns an [EventTransformer] that processes events sequentially.
+  static EventTransformer<Event> sequential<Event>({bool distinct = false}) {
+    return (events, mapper) =>
+        events.applyDistinct(distinct).asyncExpand(mapper);
+  }
+
+  /// Ignores new events until the current event processing is complete.
+  ///
+  /// This transformer is ideal for intensive operations where only the current
+  /// event should be processed fully before considering any new events.
+  ///
+  /// **Example:**
+  /// ```dart
+  /// on<ProcessIntensiveEvent>(
+  ///   _handleIntensiveTask,
+  ///   transformer: BlocEventTransformer.droppable(),
+  /// );
+  /// ```
+  ///
+  /// **Visual Representation:**
+  /// ```
+  /// Input:     --a--b--c-------->
+  /// Processing: --[a]-------->
+  /// Output:     -------x--------->  (b and c are dropped)
+  /// ```
+  ///
+  /// - [distinct] When true, skips events that are equal to the previous event
+  ///
+  /// Returns an [EventTransformer] that drops new events while processing the current one.
+  static EventTransformer<Event> droppable<Event>({bool distinct = false}) {
+    return (events, mapper) =>
+        events.applyDistinct(distinct).exhaustMap(mapper);
+  }
+
+  /// Skips events that are equal to the previous event.
+  ///
+  /// Equality is determined by the `==` operator, so your event classes
+  /// should properly implement equality for accurate comparison.
+  ///
+  /// **Example:**
+  /// ```dart
+  /// on<FilterEvent>(
+  ///   _handleFilterEvent,
+  ///   transformer: BlocEventTransformer.distinct(),
+  /// );
+  /// ```
+  ///
+  /// **Visual Representation:**
+  /// ```
+  /// Input:  --a--a--b--b--a--a-->
+  /// Output: --a-----b-----a----->  (duplicate events are skipped)
+  /// ```
+  ///
+  /// - [sequential] When true, processes events one at a time in order
+  ///
+  /// Returns an [EventTransformer] that filters out duplicate events.
+  static EventTransformer<Event> distinct<Event>({bool sequential = false}) {
+    return (events, mapper) =>
+        events.distinct().applySequential(sequential, mapper);
+  }
+
+  /// Takes only a specified number of events.
+  ///
+  /// The [count] parameter specifies the maximum number of events to take.
+  /// After [count] events are processed, no more events will be emitted.
+  ///
+  /// **Example:**
+  /// ```dart
+  /// on<LoadEvent>(
+  ///   _handleLoadEvent,
+  ///   transformer: BlocEventTransformer.take(3), // Take only first 3 events
+  /// );
+  /// ```
+  ///
+  /// **Visual Representation:**
+  /// ```
+  /// Input:  --a--b--c--d--e-->
+  /// Output: --a--b--c-------->  (with count: 3)
+  /// ```
+  ///
+  /// - [count] The maximum number of events to take
+  /// - [distinct] When true, skips events that are equal to the previous event
+  /// - [sequential] When true, processes events one at a time in order
+  ///
+  /// Returns an [EventTransformer] that takes the specified number of events.
+  static EventTransformer<Event> take<Event>(
+    int count, {
+    bool distinct = false,
+    bool sequential = false,
+  }) {
+    return (events, mapper) => events
+        .applyDistinct(distinct)
+        .take(count)
+        .applySequential(sequential, mapper);
   }
 }
