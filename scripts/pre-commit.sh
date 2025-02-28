@@ -11,6 +11,7 @@ if [ -n "$STAGED_FILES" ]; then
     echo "Fixing bloc_suite files..."
     cd packages/bloc_suite
     dart pub get
+    dart format .
     dart fix --apply
     cd ../..
   fi
@@ -20,6 +21,7 @@ if [ -n "$STAGED_FILES" ]; then
     echo "Fixing dart_suite files..."
     cd packages/dart_suite
     dart pub get
+    dart format .
     dart fix --apply
     cd ../..
   fi
