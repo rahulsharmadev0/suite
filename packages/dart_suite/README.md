@@ -1,5 +1,5 @@
 <p align="center">
-<img src="https://raw.githubusercontent.com/rahulsharmadev0/suite/refs/heads/main/assets/logo/bg_dart_suite.png" height="100" alt="Flutter Bloc Package" />
+<img src="https://raw.githubusercontent.com/rahulsharmadev0/suite/refs/heads/main/assets/logo/bg_dart_suite.png" height="150" alt="Flutter Dart Package" />
 </p>
 
 <p align="center">
