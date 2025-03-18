@@ -2,17 +2,11 @@ import 'package:bloc/bloc.dart';
 import 'package:bloc_suite/bloc_suite.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-abstract class CounterEvent extends LifecycleEvent {
-  CounterEvent({super.onCompleted, super.onError});
-}
+sealed class CounterEvent {}
 
-class Increment extends CounterEvent {
-  Increment({super.onCompleted, super.onError});
-}
+class Increment extends CounterEvent {}
 
-class Decrement extends CounterEvent {
-  Decrement({super.onCompleted, super.onError});
-}
+class Decrement extends CounterEvent {}
 
 class CounterBloc extends LifecycleBloc<CounterEvent, int> {
   CounterBloc([
@@ -48,15 +42,41 @@ void main() {
     });
 
     test('onCompleted is called after event processing', () async {
+      bool onStartCalled = false;
+      bool onSuccessCalled = false;
       bool onCompletedCalled = false;
+      bool onErrorCalled = false;
 
-      void onCompleted() => onCompletedCalled = true;
+      var incrementEvent = Increment();
+      counterBloc.addEventListener(incrementEvent, (e) {
+        print(e.status);
+        switch (e.status) {
+          case EventStatus.started:
+            onStartCalled = true;
+          case EventStatus.success:
+            onSuccessCalled = true;
+          case EventStatus.completed:
+            onCompletedCalled = true;
+          case EventStatus.error:
+            onErrorCalled = true;
+            break;
+        }
+      });
 
-      counterBloc.add(Increment(onCompleted: onCompleted));
+      counterBloc.add(incrementEvent);
 
       await Future.delayed(Duration.zero);
 
+      expect(counterBloc.hasListenersForEvent(incrementEvent), isTrue);
+
+      counterBloc.removeEventListeners(incrementEvent);
+
+      expect(onStartCalled, isTrue);
+      expect(onSuccessCalled, isTrue);
       expect(onCompletedCalled, isTrue);
+      expect(onErrorCalled, isFalse);
+      expect(counterBloc.hasListenersForEvent(incrementEvent), isFalse);
+      expect(counterBloc.hasListeners, isFalse);
     });
 
     test('increments state on Increment event', () async {

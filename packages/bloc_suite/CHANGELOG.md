@@ -1,3 +1,12 @@
+## 0.0.6 - Major Improvements
+
+### Improvements
+
+- Optimized `LifecycleBloc` for better performance
+- Improved code documentation
+- Add examples
+-
+
 ## 0.0.5 - Major Refactoring and Feature Expansion
 
 ### Breaking Changes
