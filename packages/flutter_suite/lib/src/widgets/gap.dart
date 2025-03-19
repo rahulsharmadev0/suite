@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
-extension GapExt on num {
-  Gap get gap => Gap(toDouble());
-}
 
 class MaxGap extends Gap {
   const MaxGap({super.key}) : super.expand(double.maxFinite);
@@ -79,7 +76,8 @@ class Gap extends StatelessWidget {
   Widget build(BuildContext context) {
     final scrollableState = Scrollable.maybeOf(context);
     final AxisDirection? axisDirection = scrollableState?.axisDirection;
-    final Axis? fallbackDirection = axisDirection == null ? null : axisDirectionToAxis(axisDirection);
+    final Axis? fallbackDirection =
+        axisDirection == null ? null : axisDirectionToAxis(axisDirection);
 
     return _RawGap(
       mainAxisExtent,
@@ -139,8 +137,6 @@ class _RawGap extends LeafRenderObjectWidget {
     properties.add(EnumProperty<Axis>('fallbackDirection', fallbackDirection));
   }
 }
-
-
 
 class RenderGap extends RenderBox {
   RenderGap({

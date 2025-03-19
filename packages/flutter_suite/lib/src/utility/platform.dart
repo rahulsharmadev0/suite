@@ -35,7 +35,9 @@ enum Platform {
   static bool get isFuchsia => current == Platform.fuchsia;
   static bool get isDesktop {
     Platform active = current;
-    return active == Platform.windows || active == Platform.linux || active == Platform.macOS;
+    return active == Platform.windows ||
+        active == Platform.linux ||
+        active == Platform.macOS;
   }
 
   static bool get isMobileorTablet {

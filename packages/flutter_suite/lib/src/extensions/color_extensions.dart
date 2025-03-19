@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 extension HexColor on Color {
   /// Prefixes a hash sign if [leadingHashSign] is set to `true` (default is `true`).
-  String get toHex => '#${value.toRadixString(16)}';
+  String get toHex => '#${toARGB32().toRadixString(16)}';
 
   /// Generates and returns a MaterialColor from a single Color.
   ///
@@ -15,39 +15,39 @@ extension HexColor on Color {
 MaterialColor _createMaterialColor2(Color color) {
   List strengths = <double>[.05];
   final swatch = <int, Color>{};
-  final int r = color.red, g = color.green, b = color.blue;
+  final double r = color.r, g = color.g, b = color.b;
 
   for (int i = 1; i < 10; i++) {
     strengths.add(0.1 * i);
   }
   for (var strength in strengths) {
     final double ds = 0.5 - strength;
-    swatch[(strength * 1000).round()] = Color.fromRGBO(
-      r + ((ds < 0 ? r : (255 - r)) * ds).round(),
-      g + ((ds < 0 ? g : (255 - g)) * ds).round(),
-      b + ((ds < 0 ? b : (255 - b)) * ds).round(),
-      color.alpha / 255,
+    swatch[(strength * 1000).round()] = Color.from(
+      alpha: color.a / 255,
+      red: r + ((ds < 0 ? r : (255 - r)) * ds).round(),
+      green: g + ((ds < 0 ? g : (255 - g)) * ds).round(),
+      blue: b + ((ds < 0 ? b : (255 - b)) * ds).round(),
     );
   }
-  return MaterialColor(color.value, swatch);
+  return MaterialColor(color.toARGB32(), swatch);
 }
 
 MaterialColor _createMaterialColor(Color color) {
-  final int red = color.red;
-  final int green = color.green;
-  final int blue = color.blue;
-  final int alpha = color.alpha;
+  final double red = color.r;
+  final double green = color.g;
+  final double blue = color.b;
+  final double alpha = color.a;
   final Map<int, Color> shades = {
-    50: Color.fromARGB(alpha, red, green, blue),
-    100: Color.fromARGB(alpha, red, green, blue),
-    200: Color.fromARGB(alpha, red, green, blue),
-    300: Color.fromARGB(alpha, red, green, blue),
-    400: Color.fromARGB(alpha, red, green, blue),
-    500: Color.fromARGB(alpha, red, green, blue),
-    600: Color.fromARGB(alpha, red, green, blue),
-    700: Color.fromARGB(alpha, red, green, blue),
-    800: Color.fromARGB(alpha, red, green, blue),
-    900: Color.fromARGB(alpha, red, green, blue),
+    50: Color.from(alpha: alpha, red: red, green: green, blue: blue),
+    100: Color.from(alpha: alpha, red: red, green: green, blue: blue),
+    200: Color.from(alpha: alpha, red: red, green: green, blue: blue),
+    300: Color.from(alpha: alpha, red: red, green: green, blue: blue),
+    400: Color.from(alpha: alpha, red: red, green: green, blue: blue),
+    500: Color.from(alpha: alpha, red: red, green: green, blue: blue),
+    600: Color.from(alpha: alpha, red: red, green: green, blue: blue),
+    700: Color.from(alpha: alpha, red: red, green: green, blue: blue),
+    800: Color.from(alpha: alpha, red: red, green: green, blue: blue),
+    900: Color.from(alpha: alpha, red: red, green: green, blue: blue),
   };
-  return MaterialColor(color.value, shades);
+  return MaterialColor(color.toARGB32(), shades);
 }

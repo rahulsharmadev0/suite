@@ -74,8 +74,8 @@ class PageTransition<T> extends PageRouteBuilder<T> {
   Duration get reverseTransitionDuration => reverseDuration;
 
   @override
-  Widget buildTransitions(
-      BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation, Widget child) {
+  Widget buildTransitions(BuildContext context, Animation<double> animation,
+      Animation<double> secondaryAnimation, Widget child) {
     switch (type) {
       case PageTransitionType.theme:
         return Theme.of(context)
@@ -85,7 +85,8 @@ class PageTransition<T> extends PageRouteBuilder<T> {
       case PageTransitionType.fade:
         if (isIos) {
           var fade = FadeTransition(opacity: animation, child: child);
-          return matchingBuilder.buildTransitions(this, context, animation, secondaryAnimation, fade);
+          return matchingBuilder.buildTransitions(
+              this, context, animation, secondaryAnimation, fade);
         }
         return FadeTransition(opacity: animation, child: child);
         // ignore: dead_code
@@ -101,7 +102,8 @@ class PageTransition<T> extends PageRouteBuilder<T> {
           child: child,
         );
         if (isIos) {
-          return matchingBuilder.buildTransitions(this, context, animation, secondaryAnimation, child);
+          return matchingBuilder.buildTransitions(
+              this, context, animation, secondaryAnimation, child);
         }
         return slideTransition;
         // ignore: dead_code
@@ -129,7 +131,8 @@ class PageTransition<T> extends PageRouteBuilder<T> {
             ).animate(animation),
             child: child,
           );
-          return matchingBuilder.buildTransitions(this, context, animation, secondaryAnimation, topBottom);
+          return matchingBuilder.buildTransitions(
+              this, context, animation, secondaryAnimation, topBottom);
         }
         return SlideTransition(
           position: Tween<Offset>(
@@ -165,7 +168,8 @@ class PageTransition<T> extends PageRouteBuilder<T> {
             scale: animation,
             child: child,
           );
-          return matchingBuilder.buildTransitions(this, context, animation, secondaryAnimation, scale);
+          return matchingBuilder.buildTransitions(
+              this, context, animation, secondaryAnimation, scale);
         }
         return ScaleTransition(
           alignment: alignment!,
@@ -541,9 +545,7 @@ class PageTransition<T> extends PageRouteBuilder<T> {
         // ignore: dead_code
         break;
 
-      /// FadeTransitions which is the fade transition
-
-      default:
+        /// FadeTransitions which is the fade transition
         return FadeTransition(opacity: animation, child: child);
     }
   }

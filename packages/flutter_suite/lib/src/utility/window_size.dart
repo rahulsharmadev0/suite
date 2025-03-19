@@ -42,23 +42,51 @@ enum WindowSize {
   /// Creates a [WindowSize] with the given breakpoint.
   const WindowSize(this.breakpoint);
 
+  bool operator <(WindowSize other) {
+    return breakpoint < other.breakpoint;
+  }
+
+  bool operator <=(WindowSize other) {
+    return breakpoint <= other.breakpoint;
+  }
+
+  bool operator >(WindowSize other) {
+    return breakpoint > other.breakpoint;
+  }
+
+  bool operator >=(WindowSize other) {
+    return breakpoint >= other.breakpoint;
+  }
+
   static WindowSize evaluate({
     required Orientation orientation,
     required double width,
     required double height,
+    double devicePixelRatio = 1.0,
+    double devicePhysicalDensity = 1.0,
   }) {
-    double mainDimension = orientation == Orientation.portrait ? width : height;
+    // Calculate logical dimensions (account for pixel ratio and density)
+    double logicalWidth = width / devicePixelRatio;
+    double logicalHeight = height / devicePixelRatio;
+    double mainDimension =
+        orientation == Orientation.portrait ? logicalWidth : logicalHeight;
 
-    if (mainDimension < WindowSize.COMPACT.breakpoint) {
-      return WindowSize.COMPACT;
-    } else if (mainDimension < WindowSize.MEDIUM.breakpoint) {
-      return WindowSize.MEDIUM;
-    } else if (mainDimension < WindowSize.EXPANDED.breakpoint) {
-      return WindowSize.EXPANDED;
-    } else if (mainDimension < WindowSize.LARGE.breakpoint) {
-      return WindowSize.LARGE;
-    } else {
-      return WindowSize.EXTRA_LARGE;
+    // Calculate total area for better size classification
+    double totalArea = logicalWidth * logicalHeight;
+
+    // Ensure sizes are sorted in ascending order by breakpoint
+    final sortedSizes = WindowSize.values.toList()
+      ..sort((a, b) => a.breakpoint.compareTo(b.breakpoint));
+
+    // Enhanced logic to factor in area, density, and main dimension
+    for (var size in sortedSizes) {
+      if (mainDimension <= size.breakpoint ||
+          totalArea >= size.breakpoint * size.breakpoint * 0.6) {
+        return size;
+      }
     }
+
+    // Fallback to EXTRA_LARGE
+    return WindowSize.EXTRA_LARGE;
   }
 }

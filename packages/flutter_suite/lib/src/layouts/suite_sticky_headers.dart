@@ -3,10 +3,6 @@ import 'dart:math' show min, max;
 import 'dart:ui' as ui;
 import 'package:flutter/rendering.dart';
 
-
-
-
-
 /// Builder called during layout to allow the header's content to be animated or styled based
 /// on the amount of stickiness the header has.
 ///
@@ -19,14 +15,13 @@ import 'package:flutter/rendering.dart';
 ///  -1.0 >= value >= 0.0: past stuck
 /// ```
 ///
-typedef StickyHeaderWidgetBuilder = Widget Function(BuildContext context, double stuckAmount);
-
+typedef StickyHeaderWidgetBuilder = Widget Function(
+    BuildContext context, double stuckAmount);
 
 /// Called every layout to provide the amount of stickyness a header is in.
 /// This lets the widgets animate their content and provide feedback.
 ///
 typedef RenderStickyHeaderCallback = void Function(double stuckAmount);
-
 
 /// Stick Header Widget
 ///
@@ -35,9 +30,9 @@ typedef RenderStickyHeaderCallback = void Function(double stuckAmount);
 ///
 /// Place this widget inside a [ListView], [GridView], [CustomScrollView], [SingleChildScrollView] or similar.
 ///
-class StickyHeader extends MultiChildRenderObjectWidget {
-  /// Constructs a new [StickyHeader] widget.
-  StickyHeader({
+class SuiteStickyHeader extends MultiChildRenderObjectWidget {
+  /// Constructs a new [SuiteStickyHeader] widget.
+  SuiteStickyHeader({
     super.key,
     required this.header,
     required this.content,
@@ -86,7 +81,7 @@ class StickyHeader extends MultiChildRenderObjectWidget {
 
 /// Sticky Header Builder Widget.
 ///
-/// The same as [StickyHeader] but instead of supplying a Header view, you supply a [builder] that
+/// The same as [SuiteStickyHeader] but instead of supplying a Header view, you supply a [builder] that
 /// constructs the header with the appropriate stickyness.
 ///
 /// Place this widget inside a [ListView], [GridView], [CustomScrollView], [SingleChildScrollView] or similar.
@@ -123,7 +118,7 @@ class _StickyHeaderBuilderState extends State<StickyHeaderBuilder> {
 
   @override
   Widget build(BuildContext context) {
-    return StickyHeader(
+    return SuiteStickyHeader(
       overlapHeaders: widget.overlapHeaders,
       header: LayoutBuilder(
         builder: (context, _) => widget.builder(context, _stuckAmount ?? 0.0),
@@ -143,9 +138,6 @@ class _StickyHeaderBuilderState extends State<StickyHeaderBuilder> {
     );
   }
 }
-
-
-
 
 //------------------------------------------RenderObject for StickyHeader widget------------------------------------------------
 //
@@ -222,7 +214,8 @@ class _RenderStickyHeader extends RenderBox
 
   RenderBox get _contentBox => firstChild!;
 
-  double get devicePixelRatio => ui.PlatformDispatcher.instance.implicitView?.devicePixelRatio ?? 1.5;
+  double get devicePixelRatio =>
+      ui.PlatformDispatcher.instance.implicitView?.devicePixelRatio ?? 1.5;
 
   double roundToNearestPixel(double offset) {
     return (offset * devicePixelRatio).roundToDouble() / devicePixelRatio;
@@ -243,7 +236,8 @@ class _RenderStickyHeader extends RenderBox
       max(constraints.minWidth, _contentBox.size.width),
     );
     final height = constraints.constrainHeight(
-      max(constraints.minHeight, _overlapHeaders ? contentHeight : headerHeight + contentHeight),
+      max(constraints.minHeight,
+          _overlapHeaders ? contentHeight : headerHeight + contentHeight),
     );
     size = Size(width, height);
 
@@ -261,7 +255,8 @@ class _RenderStickyHeader extends RenderBox
 
     // report to widget how much the header is stuck.
     if (_callback != null) {
-      final stuckAmount = max(min(headerHeight, stuckOffset), -headerHeight) / headerHeight;
+      final stuckAmount =
+          max(min(headerHeight, stuckOffset), -headerHeight) / headerHeight;
       _callback!(stuckAmount);
     }
   }
@@ -300,14 +295,16 @@ class _RenderStickyHeader extends RenderBox
   double computeMinIntrinsicHeight(double width) {
     return _overlapHeaders
         ? _contentBox.getMinIntrinsicHeight(width)
-        : (_headerBox.getMinIntrinsicHeight(width) + _contentBox.getMinIntrinsicHeight(width));
+        : (_headerBox.getMinIntrinsicHeight(width) +
+            _contentBox.getMinIntrinsicHeight(width));
   }
 
   @override
   double computeMaxIntrinsicHeight(double width) {
     return _overlapHeaders
         ? _contentBox.getMaxIntrinsicHeight(width)
-        : (_headerBox.getMaxIntrinsicHeight(width) + _contentBox.getMaxIntrinsicHeight(width));
+        : (_headerBox.getMaxIntrinsicHeight(width) +
+            _contentBox.getMaxIntrinsicHeight(width));
   }
 
   @override

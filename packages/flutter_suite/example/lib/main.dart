@@ -1,3 +1,5 @@
+import 'package:flutter_suite/flutter_suite.dart';
+
 import 'demos/export.dart';
 import 'package:flutter/material.dart';
 
@@ -44,7 +46,8 @@ class HomePage extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             const Text('Welcome in JARS ❤️ Demo\ndeveloped by @rahulsharmadev',
-                textAlign: TextAlign.center, style: TextStyle(fontSize: 24, color: Colors.white)),
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 24, color: Colors.white)),
             const SizedBox(height: 64),
             ...{
               '/JMarqueeDemo': 'JMarquee Demo',

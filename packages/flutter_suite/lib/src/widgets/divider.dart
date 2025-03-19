@@ -1,25 +1,19 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-enum JDividerAlignment {
-  start,
-  center,
-  end,
-}
+enum DividerAlignment { start, center, end }
 
 /// {@template j_divider}
 /// Creates a Material Design divider.
 ///
 /// The [thickness], [indent], and [endIndent] must be null or non-negative.
 ///
-//-----------------------------------------------------------------------------------------------------------------------
-/// **JDivider**: A render widget that draws a horizontal line, with an optional text in the middle.\
-/// **JDivider.vertical**: A render widget that draws a vertical line, with an optional text in the middle.
-//-----------------------------------------------------------------------------------------------------------------------
+/// **CustomDivider**: A render widget that draws a horizontal line, with an optional text in the middle.\
+/// **CustomDivider.v**: A render widget that draws a vertical line, with an optional text in the middle.
 /// {@endtemplate}
-class JDivider extends StatelessWidget {
+class CustomDivider extends StatelessWidget {
   /// {@macro j_divider}
-  const JDivider({
+  const CustomDivider({
     super.key,
     this.text,
     this.thickness,
@@ -36,7 +30,7 @@ class JDivider extends StatelessWidget {
         assert(endIndent == null || endIndent >= 0.0);
 
   /// {@macro j_divider}
-  const JDivider.vertical({
+  const CustomDivider.v({
     super.key,
     this.text,
     this.thickness,
@@ -58,7 +52,7 @@ class JDivider extends StatelessWidget {
 
   final String? text;
 
-  final JDividerAlignment? textAlign;
+  final DividerAlignment? textAlign;
 
   final double? dividerRadius;
 
@@ -111,7 +105,7 @@ class JDivider extends StatelessWidget {
     properties.add(DiagnosticsProperty<Color?>('color', color));
     properties.add(DiagnosticsProperty<Widget?>('textWidget', textWidget));
     properties.add(DiagnosticsProperty<double?>('dividerRadius', dividerRadius));
-    properties.add(DiagnosticsProperty<JDividerAlignment?>('textAlign', textAlign));
+    properties.add(DiagnosticsProperty<DividerAlignment?>('textAlign', textAlign));
     properties.add(DiagnosticsProperty<EdgeInsetsGeometry?>('textPadding', textPadding));
   }
 
@@ -124,8 +118,9 @@ class JDivider extends StatelessWidget {
   }
 
   Widget layoutBuilder(Widget divider, [Widget? child]) {
-    final textAlign = this.textAlign ?? JDividerAlignment.center;
-    final children = List.generate(3, (i) => textAlign.index == i ? child! : Expanded(child: divider));
+    final textAlign = this.textAlign ?? DividerAlignment.center;
+    final children =
+        List.generate(3, (i) => textAlign.index == i ? child! : Expanded(child: divider));
     return isVertical
         ? Column(mainAxisAlignment: MainAxisAlignment.center, children: children)
         : Row(mainAxisAlignment: MainAxisAlignment.center, children: children);
@@ -133,9 +128,11 @@ class JDivider extends StatelessWidget {
 
   Widget buildDividerLine(BuildContext context) {
     final DividerThemeData dividerTheme = DividerTheme.of(context);
-    final double thickness = this.thickness ?? dividerTheme.thickness ?? dividerTheme.thickness ?? 1;
+    final double thickness =
+        this.thickness ?? dividerTheme.thickness ?? dividerTheme.thickness ?? 1;
     final double indent = this.indent ?? dividerTheme.indent ?? dividerTheme.indent ?? 0;
-    final double endIndent = this.endIndent ?? dividerTheme.endIndent ?? dividerTheme.endIndent ?? 0;
+    final double endIndent =
+        this.endIndent ?? dividerTheme.endIndent ?? dividerTheme.endIndent ?? 0;
     final margin = EdgeInsetsDirectional.only(start: indent, end: endIndent);
     final borderSide = Divider.createBorderSide(context, color: color, width: thickness);
 
@@ -152,7 +149,9 @@ class JDivider extends StatelessWidget {
 
   Widget? buildText() {
     return text != null
-        ? Padding(padding: textPadding ?? const EdgeInsets.symmetric(horizontal: 4), child: Text(text!))
+        ? Padding(
+            padding: textPadding ?? const EdgeInsets.symmetric(horizontal: 4),
+            child: Text(text!))
         : textWidget;
   }
 }

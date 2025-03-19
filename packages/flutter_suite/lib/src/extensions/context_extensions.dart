@@ -1,11 +1,13 @@
 // ignore_for_file: non_constant_identifier_names
 
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
+import 'dart:math' as math;
+
+import 'package:flutter_suite/src/theme/text_theme_model.dart';
 
 extension ContextExtensions on BuildContext {
-//=------------------Media Query Utilities------------------
+//------------------Media Query Utilities------------------
 
   /// Platform's Height
   double get height => mQ.size.height;
@@ -13,11 +15,13 @@ extension ContextExtensions on BuildContext {
   /// Platform's Width
   double get width => mQ.size.width;
 
-  double get pxRatio => mQ.devicePixelRatio;
+  double get dpr => mQ.devicePixelRatio;
   Size get flipped => mQ.size.flipped;
   double get aspectRatio => mQ.size.aspectRatio;
   double get longestSide => mQ.size.longestSide;
   double get shortestSide => mQ.size.shortestSide;
+
+  double get dpi => _calculateDpi(height, width, dpr);
 
   MediaQueryData get mQ => MediaQuery.of(this);
 
@@ -44,7 +48,13 @@ extension ContextExtensions on BuildContext {
   Color? get iconColor => theme.iconTheme.color;
 
   /// Access the theme's text theme.
-  TextTheme get textTheme => theme.textTheme;
+  TextSelectionThemeData get textSelectionTheme => theme.textSelectionTheme;
+
+  /// Access the theme's text theme.
+  $TextTheme get TxT => $TextTheme(theme.textTheme);
+
+  /// Access the theme's primary text theme.
+  $TextTheme get pTxT => $TextTheme(theme.primaryTextTheme);
 
   // ------------------Dimension Calculations------------
 
@@ -112,4 +122,14 @@ extension ContextExtensions on BuildContext {
     return heightTransformer(dividedBy: dividedBy, reducedBy: reducedByH) /
         widthTransformer(dividedBy: dividedBy, reducedBy: reducedByW);
   }
+}
+
+double _calculateDpi(
+  double height,
+  double width,
+  double devicePixelRatio,
+) {
+  double diagonalPixels = math.sqrt(width * width + height * height);
+  double screenInches = diagonalPixels / devicePixelRatio; // Convert to inches directly
+  return diagonalPixels / screenInches; // Pixels per inch (PPI)
 }
