@@ -83,63 +83,139 @@ class CounterScreen extends BlocSelectorWidget<CounterBloc, CounterState, int> {
 
 ## LifecycleBloc
 
-The `LifecycleBloc` is a specialized Bloc that automatically handles lifecycle callbacks for events.
+The `LifecycleBloc` is a specialized Bloc that enhances event lifecycle tracking in a reactive and decoupled way. It automatically tracks the full lifecycle of each event, making it perfect for complex workflows and inter-bloc communication.
 
-#### Example
+### Key Features
+
+- **Automatic event lifecycle tracking** with distinct phases:
+  - `started` - Event received and processing begun
+  - `success` - Event processed successfully
+  - `error` - Error occurred during processing
+  - `completed` - Processing finished (regardless of outcome)
+- **Decoupled communication** between blocs without tight dependencies
+- **Reactive architecture** supporting complex workflows
+- **Event-specific listeners** that can be added and removed dynamically
+
+### Best Use Cases
+
+- **Bloc-to-Bloc communication** with minimal coupling
+- **Multi-step workflows** like authentication, payments, or file uploads
+- **Background processes** that require real-time UI updates
+- **Real-time event-driven systems** like chat apps or notification handlers
+
+### Example Usage
+
+Let's explore a practical example of communication between two blocs:
 
 ```dart
-class CounterState {
-  final int value;
-  const CounterState(this.value);
-}
+// First, create a NotepadBloc that extends LifecycleBloc
+class NotepadBloc extends LifecycleBloc<NotepadEvent, List<String>> {
+  NotepadBloc() : super([]) {
+    on<NotepadEvent>(_noteEvent);
+  }
 
-sealed class CounterEvent extends LifecycleEvent {
-  const CounterEvent({super.onCompleted,super.onSuccess, super.onError});
-}
+  FutureOr<void> _noteEvent(NotepadEvent event, Emitter emit) async {
+    // Processing logic with artificial delay to demonstrate async behavior
+    await Future.delayed(const Duration(seconds: 1));
 
-class Increment extends CounterEvent {
-  const Increment({ super.onCompleted, super.onSuccess, super.onError});
-}
-
-class CounterBloc extends LifecycleBloc<CounterEvent, CounterState> {
-  CounterBloc() : super(CounterState(0)) {
-    on<Increment>(
-      (event, emit) => emit(CounterState(state.value + 1)),
-
-      // optional
-      transformer: BlocEventTransformer.throttle(
-        const Duration(milliseconds: 500),
-      ),
-    );
+    NotepadState newState = List<String>.from(state);
+    switch (event.type) {
+      case NotepadType.add:
+        newState.add(event.note!);
+        break;
+      case NotepadType.remove:
+        newState.removeAt(event.index!);
+        break;
+      case NotepadType.edit:
+        newState[event.index!] = event.note!;
+        break;
+    }
+    emit(newState);
   }
 }
 
-class CounterScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final bloc = context.read<CounterBloc>();
-    return Scaffold(
-      body: Center(
-        child: BlocBuilder<CounterBloc, CounterState>(
-          builder: (context, state) {
-            return Text('Count: ${state.value}');
-          },
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => bloc.add(
-          Increment(
-            onSuccess: () => print('Counter increased'),
-            onCompleted: () => print('Operation completed'),
-            onError: (error) => print('Error: $error'),
-          ),
-        ),
-        child: Icon(Icons.add),
-      ),
-    );
+// Then, create a PersonBloc that depends on NotepadBloc
+class PersonBloc extends Bloc<PersonEvent, PersonState> {
+  final NotepadBloc notepadBloc;
+
+  PersonBloc(this.notepadBloc) : super(PersonIdle()) {
+    // Event handlers
+    on<AddNote>((event, emit) {
+      var notepadEvent = NotepadEvent.add(event.note);
+
+      // Register a listener for this specific event's lifecycle
+      notepadBloc.addEventListener(notepadEvent, (wrapper) {
+        switch (wrapper.status) {
+          case EventStatus.started:
+            add(_SelfEmitter(PersonWriting('Adding note: ${event.note}')));
+            break;
+          case EventStatus.success:
+            add(_SelfEmitter(PersonIdle()));
+            break;
+          case EventStatus.completed:
+            // Clean up when done
+            notepadBloc.removeEventListeners(wrapper.event);
+            break;
+        }
+      });
+
+      // Trigger the event in the notepad bloc
+      notepadBloc.add(notepadEvent);
+    });
+
+    // Additional event handlers
   }
 }
 ```
+
+### Event Lifecycle Tracking API
+
+The LifecycleBloc provides several methods for tracking events:
+
+```dart
+// Add a listener for a specific event
+StreamSubscription<EventWrapper<Event>> addEventListener(
+  Event key,
+  void Function(EventWrapper<Event> eventWrapper) callback
+);
+
+// Remove all listeners for a specific event
+void removeEventListeners(Event key);
+
+// Check if a specific event has listeners
+bool hasListenersForEvent(Event key);
+
+// Check if any events have listeners
+bool get hasListeners;
+```
+
+### EventWrapper and EventStatus
+
+Event tracking uses an `EventWrapper` class that contains:
+
+```dart
+class EventWrapper<T> {
+  final T event;        // The original event
+  final EventStatus status;  // Current status
+  final dynamic error;  // Error (if any)
+}
+
+enum EventStatus {
+  started,    // Event processing has begun
+  success,    // Event was processed successfully
+  error,      // An error occurred
+  completed   // Processing has finished (always called)
+}
+```
+
+### Best Practices
+
+1. **Always remove event listeners** when you're done with them to prevent memory leaks
+2. **Use the completed status** for cleanup operations
+3. **Keep processing logic in the primary bloc** that extends LifecycleBloc
+4. **Consider error handling** by checking for the error status
+
+LifecycleBloc provides a powerful pattern for managing complex state transitions and inter-bloc communication while maintaining loose coupling between components.
 
 ## BlocEventTransformer
 
