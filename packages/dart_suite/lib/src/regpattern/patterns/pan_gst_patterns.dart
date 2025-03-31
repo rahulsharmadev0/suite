@@ -3,15 +3,22 @@
 part of '../regpatterns.dart';
 
 mixin _PanGstPatterns {
-  RegPattern gstNumber({PanType? typeRestriction, String? firstName, String? middle, String? lastName}) {
+  RegPattern gstNumber(
+      {PanType? typeRestriction,
+      String? firstName,
+      String? middle,
+      String? lastName}) {
     var codes = typeRestriction?.code ?? PanType.codes;
-    var nfc = (firstName?.trim()[0] ?? '') + (middle?.trim()[0] ?? '') + (lastName?.trim()[0] ?? '');
+    var nfc = (firstName?.trim()[0] ?? '') +
+        (middle?.trim()[0] ?? '') +
+        (lastName?.trim()[0] ?? '');
     if (nfc.isEmpty) nfc = 'A-Z';
 
     var stateCode =
         '01|02|03|04|05|06|07|08|09|10|11|12|13|14|15|16|17|18|19|20|21|22|23|24|25|26|27|28|29|30|31|32|33|34|35|36|37|38|97|99';
     return RegPattern(
-      pattern: '^($stateCode)[A-Z]{3}[$codes]{1}[$nfc' r']{1}[0-9]{4}[A-Z]{1}\d{1}[A-Z]{1}[A-Z0-9]{1}',
+      pattern: '^($stateCode)[A-Z]{3}[$codes]{1}[$nfc'
+          r']{1}[0-9]{4}[A-Z]{1}\d{1}[A-Z]{1}[A-Z0-9]{1}',
       message: 'Invalid gst number.',
     );
   }
@@ -27,9 +34,15 @@ mixin _PanGstPatterns {
   /// - Last character: Any uppercase letter.
   ///
   /// Throws an error if the generated regex pattern is invalid.
-  RegPattern panNumber({PanType? typeRestriction, String? firstName, String? middle, String? lastName}) {
+  RegPattern panNumber(
+      {PanType? typeRestriction,
+      String? firstName,
+      String? middle,
+      String? lastName}) {
     var codes = typeRestriction?.code ?? PanType.codes;
-    var nfc = (firstName?.trim()[0] ?? '') + (middle?.trim()[0] ?? '') + (lastName?.trim()[0] ?? '');
+    var nfc = (firstName?.trim()[0] ?? '') +
+        (middle?.trim()[0] ?? '') +
+        (lastName?.trim()[0] ?? '');
     if (nfc.isEmpty) nfc = 'A-Z';
     return RegPattern(
       pattern: '^[A-Z]{3}[$codes]{1}[$nfc]{1}[0-9]{4}[A-Z]{1}',

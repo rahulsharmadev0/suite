@@ -36,11 +36,13 @@ mixin _NumericRegPatterns {
     int maxLength = 16,
   }) {
     final range = RegExp.escape(type.range + allowSpecialChar);
-    final value =
-        allowEmptyString ? '^(|[$range]{$minLength,$maxLength})\$' : '^[$range]{$minLength,$maxLength}\$';
+    final value = allowEmptyString
+        ? '^(|[$range]{$minLength,$maxLength})\$'
+        : '^[$range]{$minLength,$maxLength}\$';
     return RegPattern(
       pattern: value,
-      message: 'Only contain the numbers ${type.range} ${allowSpecialChar.split('').join(' ')} '
+      message:
+          'Only contain the numbers ${type.range} ${allowSpecialChar.split('').join(' ')} '
           'and the length should be larger than $minLength but less than $maxLength.',
     );
   }

@@ -105,7 +105,8 @@ class Throttle {
   /// ```
   /// fetchMovies('tenet', adult: true).
   /// ```
-  Object? call([List<Object?>? args, Map<Symbol, Object?>? namedArgs]) => _debounce.call(args, namedArgs);
+  Object? call([List<Object?>? args, Map<Symbol, Object?>? namedArgs]) =>
+      _debounce.call(args, namedArgs);
 }
 
 /// TopLevel lambda to create [Throttle] functions.

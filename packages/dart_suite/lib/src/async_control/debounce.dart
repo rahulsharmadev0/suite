@@ -117,7 +117,8 @@ class Debounce {
 
     // Only invoke if we have `_lastArgs` or `_lastNamedArgs` which means
     // `func` has been debounced at least once.
-    if (_trailing && (_lastArgs != _undefined || _lastNamedArgs != _undefined)) {
+    if (_trailing &&
+        (_lastArgs != _undefined || _lastNamedArgs != _undefined)) {
       return _invokeFunc(time);
     }
     _lastArgs = _lastNamedArgs = _undefined;
@@ -129,7 +130,9 @@ class Debounce {
     final timeSinceLastInvoke = time - _lastInvokeTime;
     final timeWaiting = _wait - timeSinceLastCall;
 
-    return _maxing ? math.min(timeWaiting, _maxWait! - timeSinceLastInvoke) : timeWaiting;
+    return _maxing
+        ? math.min(timeWaiting, _maxWait! - timeSinceLastInvoke)
+        : timeWaiting;
   }
 
   void _timerExpired() {

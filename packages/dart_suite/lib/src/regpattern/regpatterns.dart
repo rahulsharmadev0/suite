@@ -10,7 +10,12 @@ part 'regpattern.dart';
 const regPatterns = _RegPatterns._internal();
 
 class _RegPatterns
-    with _PasswordRegPatterns, _NumericRegPatterns, _OtherRegPatterns, _PanGstPatterns, _GeneralRegPatterns {
+    with
+        _PasswordRegPatterns,
+        _NumericRegPatterns,
+        _OtherRegPatterns,
+        _PanGstPatterns,
+        _GeneralRegPatterns {
   const _RegPatterns._internal();
 
   _FileFormatRegPatterns get fileFormats => _FileFormatRegPatterns();

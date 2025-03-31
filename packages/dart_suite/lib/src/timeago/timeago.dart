@@ -17,11 +17,15 @@ class Timeago {
   Timeago(this.duration, {String? locale, TimeagoSymbol? symbol})
       : _symbol = symbol ?? _getSymbol(locale, symbol);
 
-  factory Timeago.since(DateTime dateTime, {String? locale, TimeagoSymbol? symbol}) =>
-      Timeago(DateTime.now().difference(dateTime), locale: locale, symbol: symbol);
+  factory Timeago.since(DateTime dateTime,
+          {String? locale, TimeagoSymbol? symbol}) =>
+      Timeago(DateTime.now().difference(dateTime),
+          locale: locale, symbol: symbol);
 
   static TimeagoSymbol _getSymbol(String? locale, TimeagoSymbol? symbol) {
-    if (symbol != null && locale != null) throw ArgumentError('You can only pass one of locale or symbol.');
+    if (symbol != null && locale != null) {
+      throw ArgumentError('You can only pass one of locale or symbol.');
+    }
 
     locale = locale ?? intl.Intl.defaultLocale ?? intl.Intl.systemLocale;
     symbol = timeagoSymbolMap()[locale];

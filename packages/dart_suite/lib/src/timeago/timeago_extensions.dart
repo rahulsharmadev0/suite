@@ -1,4 +1,4 @@
-import 'package:dart_suite/src/utility/timeago/timeago.dart';
+import 'package:dart_suite/src/timeago/timeago.dart';
 
 extension DurationExt on Duration {
   /// Sample

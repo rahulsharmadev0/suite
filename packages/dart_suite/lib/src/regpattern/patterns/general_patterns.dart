@@ -11,8 +11,10 @@ mixin _GeneralRegPatterns {
     maxLength = maxLength - 2;
     var space = allowSpace ? ' ' : '';
     return RegPattern(
-        pattern: '^[a-zA-Z0-9][a-zA-Z0-9_\\-/.$space]{$minLength,$maxLength}[a-zA-Z0-9]\$',
-        message: 'Only accepts a-zA-Z - _ • / ${allowSpace ? 'and space.' : ''}');
+        pattern:
+            '^[a-zA-Z0-9][a-zA-Z0-9_\\-/.$space]{$minLength,$maxLength}[a-zA-Z0-9]\$',
+        message:
+            'Only accepts a-zA-Z - _ • / ${allowSpace ? 'and space.' : ''}');
   }
 
   /// Name regex
@@ -37,12 +39,14 @@ mixin _GeneralRegPatterns {
   RegPattern get phoneNumber {
     return RegPattern(
       pattern: r'^((?:([+]\d{1,4}).?)|0)?(\d{7,15})$',
-      message: 'Invalid phone number. Must start with "+" and 1-4 digits or "0", followed by 7-15 digits.',
+      message:
+          'Invalid phone number. Must start with "+" and 1-4 digits or "0", followed by 7-15 digits.',
     );
   }
 
   /// Postal Code
-  RegPattern postalCode({int maxLength = 6, bool allowAlphabets = false}) => RegPattern(
+  RegPattern postalCode({int maxLength = 6, bool allowAlphabets = false}) =>
+      RegPattern(
         pattern: allowAlphabets
             ? r'^[a-zA-Z0-9]{5,' + maxLength.toString() + r'}$'
             : r'^\d{5,' + maxLength.toString() + r'}?$',
