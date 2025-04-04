@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_suite/flutter_suite.dart';
 
 extension StyledText<T extends Text> on T {
-  T bold() =>
-      copyWith(style: (style ?? const TextStyle()).copyWith(fontWeight: FontWeight.bold))
-          as T;
+  T $bold() =>
+      $copyWith(style: (style ?? const TextStyle()).$fontWeight(FontWeight.bold)) as T;
 
-  Text copyWith({
+  Text $copyWith({
     String? data,
     TextStyle? style,
     StrutStyle? strutStyle,
@@ -38,7 +38,7 @@ extension StyledText<T extends Text> on T {
         selectionColor: selectionColor ?? this.selectionColor,
       );
 
-  T textStyle(TextStyle? style) => copyWith(
+  T $textStyle(TextStyle? style) => $copyWith(
         style: (this.style ?? const TextStyle()).copyWith(
           background: style?.background,
           backgroundColor: style?.backgroundColor,
@@ -68,7 +68,7 @@ extension StyledText<T extends Text> on T {
         ),
       ) as T;
 
-  Text copyWithRich({
+  Text $copyWithRich({
     InlineSpan? textSpan,
     TextStyle? style,
     StrutStyle? strutStyle,
@@ -104,68 +104,68 @@ extension StyledText<T extends Text> on T {
         selectionColor: selectionColor ?? this.selectionColor,
       );
 
-  T fontFamily(String font) => copyWith(
+  T $fontFamily(String font) => $copyWith(
         style: (style ?? const TextStyle()).copyWith(
           fontFamily: font,
         ),
       ) as T;
 
-  T fontSize(double size) => copyWith(
+  T $fontSize(double size) => $copyWith(
         style: (style ?? const TextStyle()).copyWith(
           fontSize: size,
         ),
       ) as T;
 
-  T fontWeight(FontWeight fontWeight) => copyWith(
+  T $fontWeight(FontWeight fontWeight) => $copyWith(
         style: (style ?? const TextStyle()).copyWith(
           fontWeight: fontWeight,
         ),
       ) as T;
 
-  T italic() => copyWith(
+  T $italic() => $copyWith(
         style: (style ?? const TextStyle()).copyWith(
           fontStyle: FontStyle.italic,
         ),
       ) as T;
 
-  T letterSpacing(double space) => copyWith(
+  T $letterSpacing(double space) => $copyWith(
         style: (style ?? const TextStyle()).copyWith(
           letterSpacing: space,
         ),
       ) as T;
 
-  T height(double height) => copyWith(
+  T $height(double height) => $copyWith(
         style: (style ?? const TextStyle()).copyWith(
           height: height,
         ),
       ) as T;
 
-  T textAlignment(TextAlign align) => copyWith(textAlign: align) as T;
+  T $textAlignment(TextAlign align) => $copyWith(textAlign: align) as T;
 
-  T textBaseline(TextBaseline textBaseline) => copyWith(
+  T $textBaseline(TextBaseline textBaseline) => $copyWith(
         style: (style ?? const TextStyle()).copyWith(
           textBaseline: textBaseline,
         ),
       ) as T;
 
-  T textColor(Color color) => copyWith(
+  T $textColor(Color color) => $copyWith(
         style: (style ?? const TextStyle()).copyWith(
           color: color,
         ),
       ) as T;
 
-  T textDirection(TextDirection direction) => copyWith(textDirection: direction) as T;
+  T $textDirection(TextDirection direction) => $copyWith(textDirection: direction) as T;
 
-  T textScale(TextScaler textScaler) => copyWith(
+  T $textScale(TextScaler textScaler) => $copyWith(
         textScaler: textScaler,
       ) as T;
 
-  T textShadow({
+  T $textShadow({
     Color color = const Color(0x34000000),
     double blurRadius = 0.0,
     Offset offset = Offset.zero,
   }) =>
-      copyWith(
+      $copyWith(
         style: (style ?? const TextStyle()).copyWith(
           shadows: [
             Shadow(
@@ -177,16 +177,14 @@ extension StyledText<T extends Text> on T {
         ),
       ) as T;
 
-  T textWidthBasis(TextWidthBasis textWidthBasis) =>
-      copyWith(textWidthBasis: textWidthBasis) as T;
+  T $textWidthBasis(TextWidthBasis textWidthBasis) =>
+      $copyWith(textWidthBasis: textWidthBasis) as T;
 
-  T withUnderLine() => copyWith(
-      style: (style ?? const TextStyle())
-          .copyWith(decoration: TextDecoration.underline)) as T;
+  T $withUnderLine() =>
+      $copyWith(style: (style ?? const TextStyle()).$decoration(TextDecoration.underline))
+          as T;
 
-  T wordSpacing(double space) => copyWith(
-        style: (style ?? const TextStyle()).copyWith(
-          wordSpacing: space,
-        ),
+  T $wordSpacing(double space) => $copyWith(
+        style: (style ?? const TextStyle()).$wordSpacing(space),
       ) as T;
 }

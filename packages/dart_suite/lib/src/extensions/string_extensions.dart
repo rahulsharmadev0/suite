@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-
 extension StringExtensions on String {
   bool get isNotBlank => trim().isNotEmpty;
   bool get isBlank => trim().isEmpty;
@@ -25,7 +24,8 @@ extension StringExtensions on String {
     if (length < max) return this;
     String min0 = min.abs().toString();
     String max0 = max.abs().toString();
-    RegExp readable = RegExp(r'(\w{' + min0 + r',' + max0 + r'})(?=(\w{' + max0 + r'})+(?!\w))');
+    RegExp readable = RegExp(
+        r'(\w{' + min0 + r',' + max0 + r'})(?=(\w{' + max0 + r'})+(?!\w))');
     mathFunc(Match match) => '${match[1]}$separator';
     return pattern == null
         ? replaceAllMapped(readable, mathFunc)

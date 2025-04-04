@@ -1,7 +1,6 @@
 library flutter_suite;
 
 export 'src/layouts/suite_form_layout.dart';
-export 'src/layouts/suite_sticky_headers.dart';
 export 'src/layouts/suite_adaptive_builder.dart';
 
 export 'src/widgets/gap.dart';
@@ -20,6 +19,6 @@ export 'src/extensions/rec/rec.dart';
 
 export 'src/styles/suite_decoration.dart';
 
-export 'src/theme/text_extensions.dart';
-export 'src/theme/text_theme_model.dart';
-export 'src/theme/text_style_extension.dart';
+export 'src/extensions/theme/text_extensions.dart';
+export 'src/extensions/theme/text_theme_model.dart';
+export 'src/extensions/theme/text_style_extension.dart';

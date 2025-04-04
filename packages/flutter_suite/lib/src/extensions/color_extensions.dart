@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 
 extension HexColor on Color {
   /// Prefixes a hash sign if [leadingHashSign] is set to `true` (default is `true`).
-  String get toHex => '#${toARGB32().toRadixString(16)}';
+  String get $toHex => '#${toARGB32().toRadixString(16)}';
 
   /// Generates and returns a MaterialColor from a single Color.
   ///
   /// Useful for easily conforming to [ThemeData.primarySwatch].
-  MaterialColor materialColor([bool veryHighAccuracy = false]) {
+  MaterialColor $materialColor([bool veryHighAccuracy = false]) {
     return veryHighAccuracy ? _createMaterialColor2(this) : _createMaterialColor(this);
   }
 }

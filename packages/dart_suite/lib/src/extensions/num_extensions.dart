@@ -3,7 +3,8 @@ import 'dart:math';
 import 'package:intl/intl.dart' as intl;
 
 extension IntExtensions on int {
-  DateTime fromUnixTime() => DateTime.fromMillisecondsSinceEpoch(this * 1000, isUtc: true);
+  DateTime fromUnixTime() =>
+      DateTime.fromMillisecondsSinceEpoch(this * 1000, isUtc: true);
 }
 
 extension DoubleExtensions on double {}
@@ -31,7 +32,8 @@ extension NumExtensions on num {
   /// Use Intl.defaultLocale to format the number\
   ///e.g. 2000000 => "2,000,000"
   String readableFormat([int max = 2]) =>
-      (intl.NumberFormat.decimalPattern()..maximumFractionDigits = max).format(this);
+      (intl.NumberFormat.decimalPattern()..maximumFractionDigits = max)
+          .format(this);
 
   /// Use Intl.defaultLocale to format the number\
   ///e.g. 1200000 => "1.2M"
@@ -41,7 +43,8 @@ extension NumExtensions on num {
   /// Use Intl.defaultLocale to format the number\
   ///e.g. 1200000 => "$1.2M"
   String currencyCompactFormat([int max = 2]) =>
-      (intl.NumberFormat.compactCurrency()..maximumFractionDigits = 2).format(this);
+      (intl.NumberFormat.compactCurrency()..maximumFractionDigits = 2)
+          .format(this);
 
   /// Returns an iterable from [this] inclusive to [end] exclusive.
   ///
@@ -61,12 +64,14 @@ extension NumExtensions on num {
 
   Iterable<num> to(num end, {num by = 1}) {
     if (by < 1) {
-      throw ArgumentError('Invalid step size: $by. Step size must be greater than 0');
+      throw ArgumentError(
+          'Invalid step size: $by. Step size must be greater than 0');
     }
     final count = ((end - this).abs() / by).ceil();
     // Explicit type declaration required for function argument.
-    final num Function(num) generator =
-        this >= end ? (index) => this - (by * index) : (index) => this + (by * index);
+    final num Function(num) generator = this >= end
+        ? (index) => this - (by * index)
+        : (index) => this + (by * index);
     return Iterable<num>.generate(count, generator);
   }
 

@@ -40,7 +40,8 @@ extension MapExtensions<K, V> on Map<K, V> {
       for (var key in smks)
         if (this[key] is Map && other[key] is Map) ...{
           key: (this[key] as Map).intersection(other[key] as Map) as V
-        } else if ((compareOnlyKey && containsKey(key)) || deep.equals(this[key], other[key])) ...{
+        } else if ((compareOnlyKey && containsKey(key)) ||
+            deep.equals(this[key], other[key])) ...{
           key: this[key] as V
         }
     };
@@ -48,7 +49,8 @@ extension MapExtensions<K, V> on Map<K, V> {
 
   /// Returns a new map containing key-value pairs that are present
   /// either in this map or the [other] map, but not in both.
-  Map<K, V> symmetricDifference(Map<K, V> other) => union(other).subtract(intersection(other));
+  Map<K, V> symmetricDifference(Map<K, V> other) =>
+      union(other).subtract(intersection(other));
 
   /// Returns a new [Map] where each entry is inverted, with the key becoming
   /// the value and the value becoming the key.
@@ -68,7 +70,8 @@ extension MapExtensions<K, V> on Map<K, V> {
   /// var map = {'a': 1, 'b': 2, 'c': 2};
   /// map.invert(); // May return {1: 'a', 2: 'b'} or {1: 'a', 2: 'c'}.
   /// ```
-  Map<V, K> invert() => Map.fromEntries(entries.map((entry) => MapEntry(entry.value, entry.key)));
+  Map<V, K> invert() =>
+      Map.fromEntries(entries.map((entry) => MapEntry(entry.value, entry.key)));
 
   /// Returns a new [Map] containing all the entries of [this] for which the key
   /// satisfies [test].

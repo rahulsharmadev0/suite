@@ -31,7 +31,8 @@ class ReCase {
   late String originalText;
   late List<String> _words;
 
-  ReCase._(String text, [Set<String>? symbolSet]) : symbolSet = symbolSet ?? defaultSymbolSet {
+  ReCase._(String text, [Set<String>? symbolSet])
+      : symbolSet = symbolSet ?? defaultSymbolSet {
     originalText = text;
     _words = _getWords(text);
   }

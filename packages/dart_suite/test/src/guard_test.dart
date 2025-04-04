@@ -18,7 +18,8 @@ void main() {
       expect(() => function.guardSafe(reThrow: true), throwsException);
     });
 
-    test('guardSafe with onError callback should invoke the callback on error', () {
+    test('guardSafe with onError callback should invoke the callback on error',
+        () {
       bool errorHandled = false;
       void onError(dynamic error) {
         errorHandled = true;
@@ -36,7 +37,8 @@ void main() {
       expect(result, 42);
     });
 
-    test('guard should return default value if function throws an exception', () {
+    test('guard should return default value if function throws an exception',
+        () {
       int? funTest() => throw Exception();
       int? result = funTest.guard(def: 1);
       expect(result, 1);
@@ -66,7 +68,9 @@ void main() {
       expect(result, 42);
     });
 
-    test('asyncGuard should return default value if function throws an exception', () async {
+    test(
+        'asyncGuard should return default value if function throws an exception',
+        () async {
       Future<int> asyncFunction() async => throw Exception();
       int? result = await asyncFunction.asyncGuard(def: 0);
       expect(result, 0);
@@ -77,7 +81,8 @@ void main() {
       expect(asyncFunction.asyncGuard(reThrow: true), throwsException);
     });
 
-    test('asyncGuard with onError callback should invoke the callback on error', () async {
+    test('asyncGuard with onError callback should invoke the callback on error',
+        () async {
       bool errorHandled = false;
       void onError(dynamic error) {
         errorHandled = true;

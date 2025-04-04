@@ -3,17 +3,21 @@ import 'dart:async';
 import 'package:dart_suite/src/utility.dart';
 
 /// {@macro guard_function}
-T? guard<T>(T Function() callback, {T? def, bool reThrow = false, void Function(dynamic error)? onError}) {
+T? guard<T>(T Function() callback,
+    {T? def, bool reThrow = false, void Function(dynamic error)? onError}) {
   return callback.guard(def: def, reThrow: reThrow, onError: onError);
 }
 
 /// {@macro async_guard_function}
 Future<T?> asyncGuard<T>(Future<T> Function() callback,
-        {T? def, bool reThrow = false, void Function(dynamic error)? onError}) =>
+        {T? def,
+        bool reThrow = false,
+        void Function(dynamic error)? onError}) =>
     callback.asyncGuard(def: def, reThrow: reThrow, onError: onError);
 
 /// {@macro guard_safe}
-bool guardSafe(void Function() callback, {bool reThrow = false, void Function(dynamic error)? onError}) =>
+bool guardSafe(void Function() callback,
+        {bool reThrow = false, void Function(dynamic error)? onError}) =>
     callback.guardSafe(reThrow: reThrow, onError: onError);
 
 /// {@macro async_guard_function}

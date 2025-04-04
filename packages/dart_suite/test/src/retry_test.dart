@@ -102,7 +102,10 @@ void main() {
           throw FormatException('Retry will be okay');
         }
         throw Exception('unhandled thing');
-      }, retryIf: (e, i) => e is FormatException, maxAttempts: 5, maxDelay: Duration());
+      },
+          retryIf: (e, i) => e is FormatException,
+          maxAttempts: 5,
+          maxDelay: Duration());
       await expectLater(f, throwsA(isException));
       expect(count, equals(2));
     });

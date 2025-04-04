@@ -92,7 +92,8 @@ extension DateTimeExtensions on DateTime {
   ///
   /// Delegates to [DateTime]'s built-in comparison methods and therefore obeys
   /// the same contract.
-  bool isAtOrBefore(DateTime other) => isAtSameMomentAs(other) || isBefore(other);
+  bool isAtOrBefore(DateTime other) =>
+      isAtSameMomentAs(other) || isBefore(other);
 
   /// Returns true if [this] occurs at or after [other], accounting for time
   /// zones.
@@ -108,7 +109,8 @@ extension DateTimeExtensions on DateTime {
   /// time of day unchanged if a DST change would occur during the time
   /// interval. (The returned time can still be different from the original if
   /// it would be invalid for the returned date.)
-  DateTime addCalendarDays(int numberOfDays) => copyWith(day: day + numberOfDays);
+  DateTime addCalendarDays(int numberOfDays) =>
+      copyWith(day: day + numberOfDays);
 
   /// Returns the number of calendar days till the specified date.
   ///

@@ -16,7 +16,8 @@ extension SetExtensions<E> on Set<E> {
   /// set.isEqualTo({'a', 'b'}); // false
   /// set.isEqualTo({'a', 'b', 'c', 'd'}); // false
   /// ```
-  bool isEqualTo(Set<Object> other) => length == other.length && containsAll(other);
+  bool isEqualTo(Set<Object> other) =>
+      length == other.length && containsAll(other);
 
   /// Returns `true` if [this] and [other] have no elements in common.
   ///
@@ -47,7 +48,8 @@ extension SetExtensions<E> on Set<E> {
   /// set.isSubsetOf({'a', 'b', 'c'}); // true
   /// set.isSubsetOf({'a', 'b', 'f'}); // false
   /// ```
-  bool isSubsetOf(Set<Object> other) => length <= other.length && other.containsAll(this);
+  bool isSubsetOf(Set<Object> other) =>
+      length <= other.length && other.containsAll(this);
 
   /// Returns `true` if every element of [other] is contained in [this].
   ///
@@ -57,7 +59,8 @@ extension SetExtensions<E> on Set<E> {
   /// set.isSupersetOf({'a', 'b', 'c'}); // true
   /// set.isSupersetOf({'a', 'b', 'f'}); // false
   /// ```
-  bool isSupersetOf(Set<Object> other) => length >= other.length && containsAll(other);
+  bool isSupersetOf(Set<Object> other) =>
+      length >= other.length && containsAll(other);
 
   /// Returns `true` if every element of [this] is contained in [other] and at
   /// least one element of [other] is not contained in [this].
@@ -69,7 +72,8 @@ extension SetExtensions<E> on Set<E> {
   /// set.isStrictSubsetOf({'a', 'b', 'c'}); // false
   /// set.isStrictSubsetOf({'a', 'b', 'f'}); // false
   /// ```
-  bool isStrictSubsetOf(Set<Object> other) => length < other.length && other.containsAll(this);
+  bool isStrictSubsetOf(Set<Object> other) =>
+      length < other.length && other.containsAll(this);
 
   /// Returns `true` if every element of [other] is contained in [this] and at
   /// least one element of [this] is not contained in [other].
@@ -80,7 +84,8 @@ extension SetExtensions<E> on Set<E> {
   /// set.isStrictSupersetOf({'a', 'b', 'c'}); // false
   /// set.isStrictSupersetOf({'a', 'b', 'f'}); // false
   /// ```
-  bool isStrictSupersetOf(Set<Object> other) => length > other.length && containsAll(other);
+  bool isStrictSupersetOf(Set<Object> other) =>
+      length > other.length && containsAll(other);
 
   /// Removes a random element of [this] and returns it.
   ///

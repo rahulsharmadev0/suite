@@ -32,7 +32,8 @@ extension IterableExtensions<T> on Iterable<T> {
     if (test == null) return length;
     if (isEmpty) return 0;
 
-    return map((element) => test(element) ? 1 : 0).reduce((value, element) => value + element);
+    return map((element) => test(element) ? 1 : 0)
+        .reduce((value, element) => value + element);
   }
 
   bool anyOf(List<T> ls) {
@@ -155,7 +156,8 @@ extension IterableExtensions<T> on Iterable<T> {
   ///        valueTransform: (p) => p.name);
   /// // map = {'young': ['John', 'Carl'], 'old': ['Peter', 'Sarah']}
   /// ```
-  Map<K, List<V>> groupBy<K, V>(K Function(T element) keySelector, {V Function(T element)? valueTransform}) {
+  Map<K, List<V>> groupBy<K, V>(K Function(T element) keySelector,
+      {V Function(T element)? valueTransform}) {
     ArgumentError.checkNotNull(keySelector);
 
     valueTransform ??= (element) => element as V;
@@ -184,8 +186,10 @@ extension NumIterableBasics<E extends num> on Iterable<E> {
   ///     [-47, 10, 2].max((a, b) =>
   ///     a.toString().length.compareTo(b.toString().length)).value; // -47
   /// ```
-  E? max([Comparator<E>? compare]) =>
-      isEmpty ? null : reduce(compare == null ? math.max : _generateCustomMaxFunction<E>(compare));
+  E? max([Comparator<E>? compare]) => isEmpty
+      ? null
+      : reduce(
+          compare == null ? math.max : _generateCustomMaxFunction<E>(compare));
 
   /// Returns the least number in [this], or [null] if [this] is empty.
   ///
@@ -194,8 +198,10 @@ extension NumIterableBasics<E extends num> on Iterable<E> {
   /// [-100, -200, 5].min((a, b) =>
   ///     a.toString().length.compareTo(b.toString().length)).value; // 5
   /// ```
-  E? min([Comparator<E>? compare]) =>
-      isEmpty ? null : reduce(compare == null ? math.min : _generateCustomMinFunction<E>(compare));
+  E? min([Comparator<E>? compare]) => isEmpty
+      ? null
+      : reduce(
+          compare == null ? math.min : _generateCustomMinFunction<E>(compare));
 
   /// Returns the sum of all the values in this iterable.
   ///

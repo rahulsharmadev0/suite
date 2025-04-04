@@ -19,12 +19,13 @@ class SuiteAdaptiveBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var size = context.$size;
     final active = WindowSize.evaluate(
-      orientation: context.mQ.orientation,
-      width: context.height,
-      height: context.width,
-      devicePixelRatio: context.dpr,
-      devicePhysicalDensity: context.dpi,
+      orientation: context.$orientation,
+      width: size.height,
+      height: size.width,
+      devicePixelRatio: context.$devicePixelRatio,
+      devicePhysicalDensity: context.$devicePixelsPerInch,
     );
 
     // Simplified layout selection logic
@@ -48,5 +49,5 @@ class SuiteAdaptiveBuilder extends StatelessWidget {
   }
 
   Widget _defaultLayout(BuildContext context) =>
-      Center(child: Text('No layout defined!', style: context.TxT.h2));
+      Center(child: Text('No layout defined!', style: context.$TxT.h2));
 }

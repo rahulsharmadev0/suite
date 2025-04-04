@@ -19,10 +19,12 @@ extension DurationExtensions on Duration {
   int get inMonths => (inDays / 30.4167).round();
   int get inWeeks => (inDays / 7).round();
 
-  Future delay([FutureOr Function()? callback]) => Future.delayed(this, callback);
+  Future delay([FutureOr Function()? callback]) =>
+      Future.delayed(this, callback);
 
-  hms({bool showFull = false}) => '${inHours > 0 ? '${(inHours % 60).round()}:' : ''}'
-          '${inMinutes > 0 ? '${(inMinutes % 60).round()}:' : ''}'
-          '${(inSeconds % 60).round()}'
-      .trim();
+  hms({bool showFull = false}) =>
+      '${inHours > 0 ? '${(inHours % 60).round()}:' : ''}'
+              '${inMinutes > 0 ? '${(inMinutes % 60).round()}:' : ''}'
+              '${(inSeconds % 60).round()}'
+          .trim();
 }
