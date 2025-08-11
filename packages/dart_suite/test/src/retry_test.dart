@@ -36,7 +36,7 @@ void main() {
           count++;
           throw Exception('Retry will fail');
         },
-        retryIf: (e, i) => false,
+        retryIf: (e) => false,
         maxAttempts: 5,
       );
       await expectLater(f, throwsA(isException));
@@ -50,7 +50,7 @@ void main() {
           count++;
           throw FormatException('Retry will fail');
         },
-        retryIf: (e, i) => e is FormatException,
+        retryIf: (e) => e is FormatException,
         maxAttempts: 5,
         maxDelay: Duration(),
       );
@@ -69,7 +69,7 @@ void main() {
           }
           return true;
         },
-        retryIf: (e, i) => e is FormatException,
+        retryIf: (e) => e is FormatException,
         maxAttempts: 5,
         maxDelay: Duration(),
       );
@@ -103,7 +103,7 @@ void main() {
         }
         throw Exception('unhandled thing');
       },
-          retryIf: (e, i) => e is FormatException,
+          retryIf: (e) => e is FormatException,
           maxAttempts: 5,
           maxDelay: Duration());
       await expectLater(f, throwsA(isException));

@@ -17,10 +17,8 @@ class SuiteDecoration extends Decoration {
       this.strokeWidth = 1});
 
   @override
-  BoxPainter createBoxPainter([VoidCallback? onChanged]) {
-    return _DottedDecotatorPainter(
+  BoxPainter createBoxPainter([VoidCallback? onChanged]) => _DottedDecotatorPainter(
         shape, linePosition, color, borderRadius, dash, strokeWidth);
-  }
 }
 
 class _DottedDecotatorPainter extends BoxPainter {

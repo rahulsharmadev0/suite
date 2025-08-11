@@ -98,15 +98,15 @@ class Throttle {
   ///   const Duration(milliseconds: 350),
   /// );
   ///
-  /// throttledFetchMovies(['tenet'], {#adult: true});
+  /// throttledFetchMovies.execute(['tenet'], {#adult: true});
   /// ```
   ///
   /// gives exactly the same result as
   /// ```
   /// fetchMovies('tenet', adult: true).
   /// ```
-  Object? call([List<Object?>? args, Map<Symbol, Object?>? namedArgs]) =>
-      _debounce.call(args, namedArgs);
+  Object? execute([List<Object?>? args, Map<Symbol, Object?>? namedArgs]) =>
+      _debounce.execute(args, namedArgs);
 }
 
 /// TopLevel lambda to create [Throttle] functions.

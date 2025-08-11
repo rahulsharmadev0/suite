@@ -1,4 +1,4 @@
-library page_transition;
+library;
 
 import 'package:flutter/material.dart';
 part 'page_transition_type.dart';

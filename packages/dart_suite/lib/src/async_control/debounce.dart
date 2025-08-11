@@ -10,7 +10,7 @@ const _undefined = Object();
 /// delayed `func` invocations and a [Debounce.flush] method to immediately invoke them.
 /// Provide `leading` and/or `trailing` to indicate whether `func` should be
 /// invoked on the `leading` and/or `trailing` edge of the `wait` interval.
-/// The `func` is invoked with the last arguments provided to the [call]
+/// The `func` is invoked with the last arguments provided to the [execute]
 /// function. Subsequent calls to the debounced function return the result of
 /// the last `func` invocation.
 ///
@@ -195,14 +195,14 @@ class Debounce {
   ///   const Duration(milliseconds: 350),
   /// );
   ///
-  /// debouncedFetchMovies(['tenet'], {#adult: true});
+  /// debouncedFetchMovies.execute(['tenet'], {#adult: true});
   /// ```
   ///
   /// gives exactly the same result as
   /// ```
   /// fetchMovies('tenet', adult: true).
   /// ```
-  Object? call([List<Object?>? args, Map<Symbol, Object?>? namedArgs]) {
+  Object? execute([List<Object?>? args, Map<Symbol, Object?>? namedArgs]) {
     final time = DateTime.now().millisecondsSinceEpoch;
     final isInvoking = _shouldInvoke(time);
 

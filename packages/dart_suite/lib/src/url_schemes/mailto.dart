@@ -2,6 +2,50 @@
 ///
 /// The class takes care of all the necessary encoding.
 ///
+/// ### Example
+///
+/// Basic usage with the Flutter `url_launcher` package:
+/// ```dart
+/// import 'package:url_launcher/url_launcher_string.dart';
+/// import 'package:dart_suite/dart_suite.dart';
+///
+/// final mailto = Mailto(
+///   to: ['support@example.com'],
+///   cc: ['product@example.com'],
+///   subject: 'Feedback about the app',
+///   body: 'Hi team,\n\nI just wanted to share some feedback...\n\nThanks!',
+/// );
+///
+/// Future<void> sendFeedback() async {
+///   final link = mailto.toString();
+///   if (await canLaunchUrlString(link)) {
+///     await launchUrlString(link);
+///   }
+/// }
+/// ```
+///
+/// Using validation (e.g. inside an assert so it only runs in debug):
+/// ```dart
+/// assert(() {
+///   Mailto.validateParameters(
+///     to: ['support@example.com'],
+///     cc: ['team@example.com'],
+///     subject: 'Valid subject',
+///     body: 'Optional body',
+///   );
+///   return true; // validation passed
+/// }());
+/// ```
+///
+/// Creating a minimal link with only BCC recipients:
+/// ```dart
+/// final silentTip = Mailto(bcc: ['audit@example.com']);
+/// print(silentTip); // mailto:?bcc=audit@example.com
+/// ```
+///
+/// Note: Line breaks (`\n`) in `body` will be percent-encoded automatically.
+/// Some email clients may render them differently or ignore multiple blank lines.
+///
 /// **Flutter info**
 ///
 /// You can use the `url_launcher` package for launching the

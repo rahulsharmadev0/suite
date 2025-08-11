@@ -10,14 +10,55 @@
 
 ---
 
+
 A versatile Dart package offering a comprehensive collection of utilities and tools for enhanced development productivity. Features include:
 
+- **Retry & RetryPolicy**: Automatic retry mechanism with exponential backoff
 - **Timeago**: Convert dates into human-readable format like "2 hours ago"
 - **Debounce**: Control function execution rate with delay
 - **Guard**: Safe error handling for sync/async operations
 - **ReCase**: Convert strings between different case formats
 - **RegPatterns**: Common regex patterns for validation
-- **Retry**: Automatic retry mechanism with exponential backoff
+
+---
+
+## Retry & RetryPolicy
+
+`RetryPolicy` provides a flexible way to configure retry strategies for async operations. You can set max attempts, delays, backoff, and which exceptions to retry. Use it with `retryWithPolicy`, `Retry.executeWithPolicy`, or the extension method.
+
+```dart
+import 'package:dart_suite/dart_suite.dart';
+
+final policy = RetryPolicy(
+  maxAttempts: 5,
+  initialDelay: Duration(milliseconds: 500),
+  maxDelay: Duration(seconds: 10),
+  backoffMultiplier: 2.0,
+  retryableExceptions: [TimeoutException],
+);
+
+final result = await retryWithPolicy(
+  () async => await fetchData(),
+  policy: policy,
+  retryIf: (e) => e is TimeoutException,
+  onRetry: (e) => print('Retrying after error: $e'),
+);
+
+// Or use the extension:
+final value = await (() async => await fetchData()).executeWithPolicy(policy: policy);
+```
+
+**Why use RetryPolicy?**
+- Centralizes retry logic for consistency
+- Easily swap between aggressive, default, or no-retry strategies
+- Supports exponential backoff, max delay, and custom error filtering
+
+**Defaults:**
+- `RetryPolicy.defaultPolicy` (3 attempts, 1s delay, 2x backoff)
+- `RetryPolicy.aggressivePolicy` (5 attempts, 0.5s delay, 1.5x backoff)
+- `RetryPolicy.noRetry` (single attempt)
+
+See the API docs and `lib/src/async_control/retry.dart` for more details.
 - **Throttle**: Rate limiting for function calls
 - **Extensions**: Utility extensions for enhanced Dart functionality
 
