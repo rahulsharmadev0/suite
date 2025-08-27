@@ -6,5 +6,4 @@ export 'extensions/map_extensions.dart';
 export 'extensions/num_extensions.dart';
 export 'extensions/string_extensions.dart';
 export 'extensions/mapentry_extension.dart';
-export 'extensions/record_extensions.dart';
 export 'extensions/set_extensions.dart';

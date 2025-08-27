@@ -10,8 +10,7 @@
 
 ---
 
-
-A versatile Dart package offering a comprehensive collection of utilities and tools for enhanced development productivity. Features include:
+A versatile Dart package offering a comprehensive collection of utilities, extensions, and data structures for enhanced development productivity. Features include:
 
 - **Retry & RetryPolicy**: Automatic retry mechanism with exponential backoff
 - **Timeago**: Convert dates into human-readable format like "2 hours ago"
@@ -19,6 +18,8 @@ A versatile Dart package offering a comprehensive collection of utilities and to
 - **Guard**: Safe error handling for sync/async operations
 - **ReCase**: Convert strings between different case formats
 - **RegPatterns**: Common regex patterns for validation
+- **LRU Cache**: Efficient Least Recently Used cache data structure
+- **Typedefs**: Handy typedefs for cleaner code
 
 ---
 
@@ -49,18 +50,132 @@ final value = await (() async => await fetchData()).executeWithPolicy(policy: po
 ```
 
 **Why use RetryPolicy?**
+
 - Centralizes retry logic for consistency
 - Easily swap between aggressive, default, or no-retry strategies
 - Supports exponential backoff, max delay, and custom error filtering
 
 **Defaults:**
+
 - `RetryPolicy.defaultPolicy` (3 attempts, 1s delay, 2x backoff)
 - `RetryPolicy.aggressivePolicy` (5 attempts, 0.5s delay, 1.5x backoff)
 - `RetryPolicy.noRetry` (single attempt)
 
 See the API docs and `lib/src/async_control/retry.dart` for more details.
+
 - **Throttle**: Rate limiting for function calls
 - **Extensions**: Utility extensions for enhanced Dart functionality
+
+---
+
+## LRU Cache
+
+An efficient Least Recently Used (LRU) cache data structure for managing limited-size caches with automatic eviction of least recently used items.
+
+```dart
+import 'package:dart_suite/dart_suite.dart';
+
+final cache = LruCache<String, int>(capacity: 3);
+cache['a'] = 1;
+cache['b'] = 2;
+cache['c'] = 3;
+print(cache['a']); // 1
+cache['d'] = 4; // 'b' is evicted (least recently used)
+print(cache.containsKey('b')); // false
+```
+
+**Features:**
+
+- Fast O(1) get/set operations
+- Automatic eviction of least recently used items
+- Customizable capacity
+
+---
+
+## Typedefs Toolkit
+
+Lightweight, type-safe, and expressive typedefs for Dart & Flutter. No boilerplate classes needed!
+
+### Why use this?
+
+- Clean & descriptive code without extra class definitions
+- Type-safe alternative to raw Maps or Lists
+- Easy to serialize & debug (records print nicely)
+- Works seamlessly in Dart & Flutter projects
+
+### 📂 Categories & Typedefs
+
+#### 📍 Geometry & Spatial
+
+- `Point2D` → `(x, y)`
+- `Point3D` → `(x, y, z)`
+- `GeoCoordinate` → `(lat, lng)`
+- `GeoCoordinate3D` → `(lat, lng, alt, acc?)`
+- `Dimension` → `(length, width, height)`
+
+#### 🌐 Data Structures
+
+- `JSON<T>` → `Map<String, T>`
+- `JSON_1<T>` → `(key, value)`
+- `Pair<A, B>` → `(first, second)`
+- `Triple<A, B, C>` → `(first, second, third)`
+
+#### 🛠 Utility & Domain-Oriented
+
+- `IdName` → `(id, name)`
+- `RGB` → `(r, g, b)`
+- `RGBA` → `(r, g, b, a)`
+- `RectBounds` → `(x, y, width, height)`
+- `Pagination` → `(page, pageSize, totalCount?)`
+
+#### ☕ Java-like Functional Typedefs
+
+- `Predicate<T>` → `bool Function(T t)`
+- `BiPredicate<T, U>` → `bool Function(T t, U u)`
+- `Consumer<T>` → `void Function(T t)`
+- `BiConsumer<T, U>` → `void Function(T t, U u)`
+- `Supplier<T>` → `T Function()`
+- `UnaryOperator<T>` → `T Function(T operand)`
+- `BinaryOperator<T>` → `T Function(T left, T right)`
+- `Runnable` → `void Function()`
+- `Callable<V>` → `V Function()`
+- `Comparator<T>` → `int Function(T o1, T o2)`
+- `ThrowingConsumer<T>` → `void Function(T t)`
+- `ThrowingSupplier<T>` → `T Function()`
+- `ThrowingFunction<T, R>` → `R Function(T t)`
+
+### 📝 Usage Examples
+
+```dart
+import 'package:dart_suite/dart_suite.dart';
+
+Future<List<GeoCoordinate>> fetchFromServer(String url, Pagination pageInfo) {
+  ... // fetch data using pageInfo.page and pageInfo.pageSize
+}
+
+List<GeoCoordinate>? getFromCache(String url, Pagination pageInfo) {
+  ... // get data using pageInfo.page and pageInfo.pageSize
+}
+
+void main() {
+
+  Pagination pageInfo = (page: 1, pageSize: 20, totalCount: 95);
+  String apiUrl = "https://api.example.com/locations";
+
+  // Use asyncGuard to fall back to cache on error
+  final data = await asyncGuard(
+    () => fetchFromServer(apiUrl, pageInfo),
+    def: getFromCache(apiUrl, pageInfo),
+    onError: (e) => print('Fetch failed, using cache: $e'),
+  );
+}
+```
+
+### 💡 Notes
+
+- These typedefs are **not replacements** for Flutter’s core types like `Size`, `Offset`, `Rect`, or `DateTimeRange`.
+- They are designed for **lightweight data modeling**, JSON mapping, and utility/functional programming use cases.
+- You can extend them with helper methods using **extensions** for added functionality.
 
 ---
 

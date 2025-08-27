@@ -1,9 +1,15 @@
 ## 0.0.4
 ### Added
-- Introduced `RetryPolicy` class for flexible and reusable retry strategies in async operations. Now you can configure retry attempts, delays, backoff, and exception types in a single place and use it with `retryWithPolicy` and related helpers.
+
+- Java-like functional typedefs (Predicate, BiPredicate, Consumer, BiConsumer, Supplier, UnaryOperator, BinaryOperator, Runnable, Callable, Comparator, ThrowingConsumer, ThrowingSupplier, ThrowingFunction, etc.) for expressive functional programming in Dart.
+- `lcm` and `gcd` extensions for `int` and `Iterable<int>`
+- LRU Cache data structure (`LruCache<K, V>`) for efficient caching
+- Improved typedef documentation and usage examples in README.md.
 
 ## 0.0.3
+
 - Improved naming conventions for better code readability
+- Introduced `RetryPolicy` class for flexible and reusable retry strategies in async operations. Now you can configure retry attempts, delays, backoff, and exception types in a single place and use it with `retryWithPolicy` and related helpers.
 
 ## 0.0.2
 

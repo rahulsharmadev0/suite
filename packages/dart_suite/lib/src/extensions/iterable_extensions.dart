@@ -1,8 +1,9 @@
 import 'dart:convert';
 import 'dart:math' as math;
 import 'package:crypto/crypto.dart' as crypto;
+import 'package:dart_suite/dart_suite.dart';
 
-extension NullableIterableGettersExtensions<T> on Iterable<T?> {
+extension NullableIterableGettersExtension<T> on Iterable<T?> {
   Iterable<T> get nonNulls {
     return [
       for (var e in this)
@@ -20,7 +21,7 @@ extension NullableIterableGettersExtensions<T> on Iterable<T?> {
   }
 }
 
-extension IterableExtensions<T> on Iterable<T> {
+extension IterableExtension<T> on Iterable<T> {
   /// Returns the number of elements that matches the [test].\
   /// If not [test] is specified it will count every element.\
   /// Example:
@@ -178,7 +179,7 @@ extension IterableExtensions<T> on Iterable<T> {
 }
 
 /// Utility extension methods for [Iterable]s containing [num]s.
-extension NumIterableBasics<E extends num> on Iterable<E> {
+extension NumIterableExtenstion<E extends num> on Iterable<E> {
   /// Returns the greatest number in [this], or [null] if [this] is empty.
   ///
   /// Example:
@@ -188,8 +189,7 @@ extension NumIterableBasics<E extends num> on Iterable<E> {
   /// ```
   E? max([Comparator<E>? compare]) => isEmpty
       ? null
-      : reduce(
-          compare == null ? math.max : _generateCustomMaxFunction<E>(compare));
+      : reduce(compare == null ? math.max : _generateCustomMaxFunction<E>(compare));
 
   /// Returns the least number in [this], or [null] if [this] is empty.
   ///
@@ -200,8 +200,7 @@ extension NumIterableBasics<E extends num> on Iterable<E> {
   /// ```
   E? min([Comparator<E>? compare]) => isEmpty
       ? null
-      : reduce(
-          compare == null ? math.min : _generateCustomMinFunction<E>(compare));
+      : reduce(compare == null ? math.min : _generateCustomMinFunction<E>(compare));
 
   /// Returns the sum of all the values in this iterable.
   ///
@@ -251,17 +250,38 @@ T Function(T, T) _generateCustomMinFunction<T>(Comparator<T> compare) {
   return min;
 }
 
-extension IntBasics<E extends int> on Iterable<E> {
+extension IntegerExtensions on Iterable<int> {
   String get base64Encode => base64.encode(toList());
 
   String get utf8Decode => utf8.decode(toList());
 
   crypto.Digest get sha1 => crypto.sha1.convert(toList());
+
   crypto.Digest get sha224 => crypto.sha224.convert(toList());
+
   crypto.Digest get sha256 => crypto.sha256.convert(toList());
+
   crypto.Digest get sha512 => crypto.sha512.convert(toList());
+
   crypto.Digest get sha512224 => crypto.sha512224.convert(toList());
+
   crypto.Digest get sha512256 => crypto.sha512256.convert(toList());
 
   crypto.Digest get md5 => crypto.md5.convert(toList());
+
+  /// Returns the greatest common divisor (GCD) of all integers in the list.
+  ///
+  /// Throws an [ArgumentError] if the list is empty.
+  int gcd() {
+    if (isEmpty) throw ArgumentError('The list must not be empty.');
+    return reduce((a, b) => a.gcd(b));
+  }
+
+  /// Returns the least common multiple (LCM) of all integers in the list.
+  ///
+  /// Throws an [ArgumentError] if the list is empty.
+  int lcm() {
+    if (isEmpty) throw ArgumentError('The list must not be empty.');
+    return reduce((a, b) => a.lcm(b));
+  }
 }
