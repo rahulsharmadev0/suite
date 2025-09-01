@@ -19,7 +19,7 @@ targets:
 
 builders:
   singleton:
-    import: "package:gen_suite/builder.dart"
+    import: "package:gen_suite/gen_suite.dart"
     builder_factories: ["singletonBuilder"]
     build_extensions: { ".dart": [".g.part"] }
     auto_apply: dependents
