@@ -8,7 +8,7 @@ on:
     paths:
       - "packages/bloc_suite/**"
       - "packages/dart_suite/**"
-
+      - "packages/gen_suite/**"
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -24,6 +24,7 @@ jobs:
     outputs:
       bloc_suite_changed: ${{ steps.check_changes.outputs.bloc_suite_changed }}
       dart_suite_changed: ${{ steps.check_changes.outputs.dart_suite_changed }}
+      gen_suite_changed: ${{ steps.check_changes.outputs.gen_suite_changed }}
 
     steps:
       - uses: actions/checkout@v4
@@ -47,6 +48,12 @@ jobs:
             echo "dart_suite_changed=true" >> $GITHUB_OUTPUT
           else
             echo "dart_suite_changed=false" >> $GITHUB_OUTPUT
+          fi
+          
+          if echo "$CHANGED_FILES" | grep -q "packages/gen_suite/"; then
+            echo "gen_suite_changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "gen_suite_changed=false" >> $GITHUB_OUTPUT
           fi
 
   publish_bloc_suite:
@@ -161,6 +168,68 @@ jobs:
             exit 0
           fi
 
+      - name: 🔐 Setup Pub Credentials
+        if: success() && github.ref == 'refs/heads/main'
+        run: |
+          mkdir -p "$XDG_CONFIG_HOME/dart"
+          echo '${{ secrets.PUB_CREDENTIALS }}' > "$XDG_CONFIG_HOME/dart/pub-credentials.json"
+          ls -l "$XDG_CONFIG_HOME/dart"
+
+      - name: 🎯 Verify Package
+        if: success()
+        run: dart pub publish --dry-run
+
+      - name: 📢 Publish Package
+        if: success() && github.ref == 'refs/heads/main'
+        run: dart pub publish -f
+
+  publish_gen_suite:
+    needs: detect_changes
+    if: needs.detect_changes.outputs.gen_suite_changed == 'true'
+    defaults:
+      run:
+        working-directory: packages/gen_suite
+    
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📚 Git Checkout
+        uses: actions/checkout@v4
+
+      - name: 🎯 Setup Dart
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: ${{ env.DART_SDK_VERSION }}
+
+      - name: 📦 Install Dependencies
+        run: |
+          dart pub get
+
+      - name: 🔍 Run Analysis
+        run: dart analyze
+
+      - name: 🧪 Run Tests
+        run: dart run build_runner test --delete-conflicting-outputs
+
+      - name: 🔄 Check If Version Changed
+        id: check_version
+        run: |
+          LOCAL_VERSION=$(grep 'version:' pubspec.yaml | awk '{print $2}')
+
+          # Try fetching remote version, default to 0.0.0 if not found
+          REMOTE_VERSION=$(dart pub info gen_suite 2>/dev/null | grep 'version:' | awk '{print $2}' || echo "0.0.0")
+
+          echo "Local version: $LOCAL_VERSION"
+          echo "Remote version: $REMOTE_VERSION"
+
+          # If package is not found, proceed with publishing
+          if [ "$REMOTE_VERSION" = "0.0.0" ]; then
+            echo "Package not found on pub.dev. Proceeding with publish."
+          elif dpkg --compare-versions "$LOCAL_VERSION" le "$REMOTE_VERSION"; then
+            echo "Local version ($LOCAL_VERSION) is not newer than remote ($REMOTE_VERSION). Skipping publish."
+            exit 0
+          fi
+          
       - name: 🔐 Setup Pub Credentials
         if: success() && github.ref == 'refs/heads/main'
         run: |

@@ -1,3 +1,7 @@
+## 0.0.5
+### Added
+- @singleton annotation for generating singleton classes, necessary for gen_suite package functionality.
+
 ## 0.0.4
 ### Added
 

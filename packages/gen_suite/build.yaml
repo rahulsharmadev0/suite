@@ -1,0 +1,27 @@
+targets:
+  $default:
+    builders:
+      gen_suite|singleton:
+        enabled: true
+        generate_for:
+          exclude:
+            - example
+            - test/source_gen_src.dart
+          include:
+            - test/*
+            - test/**/*
+        options:
+          format: true
+      source_gen|combining_builder:
+        options:
+          ignore_for_file:
+            - "type=lint"
+
+builders:
+  singleton:
+    import: "package:gen_suite/builder.dart"
+    builder_factories: ["singletonBuilder"]
+    build_extensions: { ".dart": [".g.part"] }
+    auto_apply: dependents
+    build_to: cache
+    applies_builders: ["source_gen|combining_builder"]

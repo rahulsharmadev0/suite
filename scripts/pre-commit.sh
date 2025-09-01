@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Get all staged files in the specified packages
-STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACMR | grep -E "^packages/(bloc_suite|dart_suite)/.*\.(dart)$")
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACMR | grep -E "^packages/(bloc_suite|dart_suite|gen_suite)/.*\.(dart)$")
 
 if [ -n "$STAGED_FILES" ]; then
   echo "Running dart fix on staged Dart files..."
@@ -20,6 +20,16 @@ if [ -n "$STAGED_FILES" ]; then
   if echo "$STAGED_FILES" | grep -q "^packages/dart_suite/"; then
     echo "Fixing dart_suite files..."
     cd packages/dart_suite
+    dart pub get
+    dart format .
+    dart fix --apply
+    cd ../..
+  fi
+
+    # Check if dart_suite has changes
+  if echo "$STAGED_FILES" | grep -q "^packages/gen_suite/"; then
+    echo "Fixing gen_suite files..."
+    cd packages/gen_suite
     dart pub get
     dart format .
     dart fix --apply
