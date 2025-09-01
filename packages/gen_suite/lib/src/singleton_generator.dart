@@ -97,12 +97,6 @@ final class SingletonGenerator extends GeneratorForAnnotation<Singleton> {
 /// - `fields` are the constructor parameters converted to `_FieldInfo`.
 /// - `classElement` is the base class element for accessing type parameters.
 final class _SingletonConfig {
-  final String baseClassName;
-  final String publicClassName;
-  final ConstructorElement2? constructor;
-  final List<_FieldInfo> fields;
-  final ClassElement2 classElement;
-
   const _SingletonConfig({
     required this.baseClassName,
     required this.publicClassName,
@@ -117,11 +111,13 @@ final class _SingletonConfig {
     ConstantReader annotation,
   ) {
     final baseClassName = classElement.name3!;
-    final publicClassName = baseClassName.substring(1); // since, class is privates
+    final publicClassName =
+        baseClassName.substring(1); // since, class is privates
     final constructorName = _extractConstructorName(annotation);
     final constructor = _findConstructor(classElement, constructorName);
 
-    final parameters = constructor?.formalParameters ?? <FormalParameterElement>[];
+    final parameters =
+        constructor?.formalParameters ?? <FormalParameterElement>[];
     final fields = parameters.map(_FieldInfo.fromParameter).toList();
 
     return _SingletonConfig(
@@ -132,6 +128,11 @@ final class _SingletonConfig {
       classElement: classElement,
     );
   }
+  final String baseClassName;
+  final String publicClassName;
+  final ConstructorElement2? constructor;
+  final List<_FieldInfo> fields;
+  final ClassElement2 classElement;
 
   /// Extracts constructor name from annotation.
   static String? _extractConstructorName(ConstantReader annotation) {
@@ -168,7 +169,8 @@ final class _SingletonConfig {
           return name.startsWith('_');
         });
 
-        final hasOnlyFactoryConstructors = constructors.every((c) => c.isFactory);
+        final hasOnlyFactoryConstructors =
+            constructors.every((c) => c.isFactory);
 
         if (hasOnlyPrivateConstructors) {
           throw InvalidGenerationSourceError(
@@ -199,7 +201,8 @@ final class _SingletonConfig {
       return unnamedConstructors.first;
     } else {
       // Find named constructor
-      final namedConstructors = constructors.where((c) => c.name3 == constructorName);
+      final namedConstructors =
+          constructors.where((c) => c.name3 == constructorName);
 
       if (namedConstructors.isEmpty) {
         throw InvalidGenerationSourceError(
@@ -247,9 +250,8 @@ final class _SingletonConfig {
 /// - constructors (either simple or parameterized), and
 /// - getters to access constructor parameters.
 final class _SingletonClassBuilder {
-  final _SingletonConfig _config;
-
   const _SingletonClassBuilder(this._config);
+  final _SingletonConfig _config;
 
   /// Builds the complete singleton class.
   Class build() {
@@ -357,7 +359,8 @@ final class _SingletonClassBuilder {
   ///   internal constructor and sets `_instance`.
   void _addParameterizedConstructors(ClassBuilder builder) {
     // Internal constructor
-    final internalParams = _ParameterBuilder.buildInternalParameters(_config.fields);
+    final internalParams =
+        _ParameterBuilder.buildInternalParameters(_config.fields);
 
     builder.constructors.add(
       Constructor(
@@ -372,7 +375,8 @@ final class _SingletonClassBuilder {
     );
 
     // Factory init constructor - keeping the raw string for now since complex expression
-    final factoryParams = _ParameterBuilder.buildFactoryParameters(_config.fields);
+    final factoryParams =
+        _ParameterBuilder.buildFactoryParameters(_config.fields);
     final internalArgs = _buildInternalArgs();
 
     builder.constructors.add(
@@ -425,7 +429,6 @@ final class _SingletonClassBuilder {
     if (_config.hasParameters) {
       throw InvalidGenerationSourceError(
         'Constructor with parameters should be handled by parameterized constructor generation, not simple.',
-        element: null,
       );
     }
 
@@ -561,9 +564,10 @@ final class _ParameterBuilder {
             ..named = true
             ..required = field.isRequiredNamed
             ..type = refer(field.typeCode)
-            ..defaultTo = (!field.isRequiredNamed && field.defaultValueCode != null)
-                ? Code(field.defaultValueCode!)
-                : null,
+            ..defaultTo =
+                (!field.isRequiredNamed && field.defaultValueCode != null)
+                    ? Code(field.defaultValueCode!)
+                    : null,
         ),
       );
     }
@@ -613,9 +617,10 @@ final class _ParameterBuilder {
             ..type = refer(field.typeCode)
             ..named = true
             ..required = field.isRequiredNamed
-            ..defaultTo = (!field.isRequiredNamed && field.defaultValueCode != null)
-                ? Code(field.defaultValueCode!)
-                : null,
+            ..defaultTo =
+                (!field.isRequiredNamed && field.defaultValueCode != null)
+                    ? Code(field.defaultValueCode!)
+                    : null,
         ),
       );
     }
@@ -659,10 +664,6 @@ final class _ArgumentBuilder {
 
 /// Groups fields by parameter type for easier processing.
 final class _ParameterGroups {
-  final List<_FieldInfo> requiredPositional;
-  final List<_FieldInfo> optionalPositional;
-  final List<_FieldInfo> named;
-
   const _ParameterGroups({
     required this.requiredPositional,
     required this.optionalPositional,
@@ -689,6 +690,9 @@ final class _ParameterGroups {
       named: named,
     );
   }
+  final List<_FieldInfo> requiredPositional;
+  final List<_FieldInfo> optionalPositional;
+  final List<_FieldInfo> named;
 }
 
 /// Container for constructor parameter sets.
@@ -702,15 +706,6 @@ typedef _ParameterSet = ({List<Parameter> required, List<Parameter> optional});
 ///   underscore). We ensure the private field name is valid even if the
 ///   original name already started with an underscore.
 final class _FieldInfo {
-  final String name;
-  final String fieldName;
-  final String typeCode;
-  final bool isRequiredPositional;
-  final bool isOptionalPositional;
-  final bool isNamed;
-  final bool isRequiredNamed;
-  final String? defaultValueCode;
-
   const _FieldInfo({
     required this.name,
     required this.fieldName,
@@ -730,7 +725,8 @@ final class _FieldInfo {
 
     // Extract default value if available
     String? defaultValueCode;
-    if (parameter.defaultValueCode != null && parameter.defaultValueCode!.isNotEmpty) {
+    if (parameter.defaultValueCode != null &&
+        parameter.defaultValueCode!.isNotEmpty) {
       defaultValueCode = parameter.defaultValueCode!;
     }
 
@@ -745,6 +741,14 @@ final class _FieldInfo {
       defaultValueCode: defaultValueCode,
     );
   }
+  final String name;
+  final String fieldName;
+  final String typeCode;
+  final bool isRequiredPositional;
+  final bool isOptionalPositional;
+  final bool isNamed;
+  final bool isRequiredNamed;
+  final String? defaultValueCode;
 
   /// Converts parameter name to private field name.
   static String _toPrivateFieldName(String name) =>
