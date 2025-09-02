@@ -1,6 +1,13 @@
 
 # Changelog
 
+## 0.0.7 - Patch 📃
+### 🎉 Upgrade to dart_suite ^0.0.7
+
+### Improvements 🔧
+- Updated README with additional usage examples for `Optional<T>`.
+- Bug fixes and performance improvements.
+
 ## 0.0.6 - Minor 🚀
 ### 🎉 Upgrade to dart_suite ^0.0.6
 

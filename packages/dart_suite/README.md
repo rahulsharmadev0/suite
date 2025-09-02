@@ -42,29 +42,30 @@ A versatile Dart package offering a comprehensive collection of utilities, exten
 
 - [🚀 Quick Start](#-quick-start)
 - [🔄 Asynchronous Utilities](#-asynchronous-utilities)
-  - [🔁 Retry & RetryPolicy](#-retry--retrypolicy)
-  - [⏱️ Debounce](#%EF%B8%8F-debounce)
-  - [🛡️ Guard](#%EF%B8%8F-guard)
-  - [🚦 Throttle](#-throttle)
+  - [Retry & RetryPolicy](#-retry--retrypolicy)
+  - [Debounce](#%EF%B8%8F-debounce)
+  - [Guard](#%EF%B8%8F-guard)
+  - [Throttle](#-throttle)
 - [💾 Data Structures & Algorithms](#-data-structures--algorithms)
-  - [🗂️ LRU Cache](#%EF%B8%8F-lru-cache)
-  - [🧮 LCM & GCD](#-lcm--gcd)
+  - [LRU Cache](#%EF%B8%8F-lru-cache)
+  - [LCM & GCD](#-lcm--gcd)
 - [📝 Utility Typedefs](#-utility-typedefs)
-  - [📍 Geometry & Spatial](#-geometry--spatial)
-  - [🌐 Data Structures](#-data-structures)
-  - [🛠️ Utility & Domain-Oriented](#%EF%B8%8F-utility--domain-oriented)
-  - [☕ Java-like Functional Typedefs](#-java-like-functional-typedefs)
+  - [Geometry & Spatial](#-geometry--spatial)
+  - [Data Structures](#-data-structures)
+  - [Utility & Domain-Oriented](#%EF%B8%8F-utility--domain-oriented)
+  - [Java-like Functional Typedefs](#-java-like-functional-typedefs)
+- [📦 Options & Null Safety](#-options--null-safety)
 - [⏰ Time Utilities](#-time-utilities)
-  - [🕐 Timeago](#-timeago)
+  - [Timeago](#-timeago)
 - [🔤 Text Processing](#-text-processing)
-  - [🔄 ReCase](#-recase)
-  - [🔍 RegPatterns](#-regpatterns)
+  - [ ReCase](#-recase)
+  - [RegPatterns](#-regpatterns)
 - [🌐 URL Schemes](#-url-schemes)
-  - [📧 Mailto](#-mailto)
+  - [Mailto](#-mailto)
 - [🏗️ Annotations & Code Generation](#%EF%B8%8F-annotations--code-generation)
-  - [🔒 Singleton Annotation](#-singleton-annotation)
+  - [Singleton Annotation](#-singleton-annotation)
 - [🔧 Validation](#-validation)
-  - [✅ ValidatorMixin](#-validatormixin)
+  - [ValidatorMixin](#-validatormixin)
 - [🚀 Extensions](#-extensions)
 - [🤝 Contributing](#-contributing)
 - [📄 License](#-license)
@@ -1209,38 +1210,35 @@ part 'my_service.g.dart'; // This file will be generated
 abstract class _ApiService {
   // Constructor with various parameter types
   _ApiService(
-    this.apiKey,                    // Required positional
-    this.baseUrl, {                 // Required positional
-    this.timeout = 30,              // Named with default
-    this.retryCount = 3,            // Named with default
-    this.debugMode = false,         // Named with default
-    required this.userAgent,        // Required named
+    String apiKey,                 // Required positional
+    String baseUrl, {              // Required positional
+    int timeout = 30,              // Named with default
+    int retryCount = 3,            // Named with default
+    bool debugMode = false,        // Named with default
+    String this.userAgent,         // Required named
   }) {
     print('ApiService initialized with key: ${apiKey.substring(0, 8)}...');
-    _setupHttpClient();
-  }
 
-  final String apiKey;
-  final String baseUrl;
-  final int timeout;
-  final int retryCount;
-  final bool debugMode;
-  final String userAgent;
-
-  late final HttpClient _client;
-
-  void _setupHttpClient() {
     _client = HttpClient()
       ..connectionTimeout = Duration(seconds: timeout)
       ..userAgent = userAgent;
   }
 
+  late final HttpClient _client;
+
   Future<Map<String, dynamic>> get(String endpoint) async {
+    if(APIService.I.baseUrl.isEmpty) { // Access via singleton instance
+      throw Exception("Base URL cannot be empty");
+    }
     // Implementation here
     return {};
   }
-
+  
+  bool get debugMode; // don't define it, it's auto-generated
   Future<Map<String, dynamic>> post(String endpoint, Map<String, dynamic> data) async {
+    if(debugMode) { // Access via getter
+      //....do something
+    }
     // Implementation here
     return {};
   }
@@ -1252,117 +1250,28 @@ abstract class _ApiService {
 // In your terminal:
 dart run build_runner build
 
-// This generates my_service.g.dart with:
-class ApiService extends _ApiService {
-  static ApiService? _instance;
-
-  ApiService._(
-    super.apiKey,
-    super.baseUrl, {
-    super.timeout = 30,
-    super.retryCount = 3,
-    super.debugMode = false,
-    required super.userAgent,
-  });
-
-  static ApiService getInstance(
-    String apiKey,
-    String baseUrl, {
-    int timeout = 30,
-    int retryCount = 3,
-    bool debugMode = false,
-    required String userAgent,
-  }) {
-    return _instance ??= ApiService._(
-      apiKey,
-      baseUrl,
-      timeout: timeout,
-      retryCount: retryCount,
-      debugMode: debugMode,
-      userAgent: userAgent,
-    );
-  }
-}
-```
 
 ```dart
 // Step 3: Use your singleton
 void main() {
   // First call creates the instance
-  final apiService1 = ApiService.getInstance(
+  final apiService1 = ApiService.init(
     'your-api-key-here',
     'https://api.example.com',
     timeout: 45,
     userAgent: 'MyApp/1.0',
   );
 
-  // Subsequent calls return the same instance
-  final apiService2 = ApiService.getInstance(
-    'any-key',           // These parameters are ignored
-    'any-url',           // after first initialization
-    timeout: 999,        //
-    userAgent: 'ignored', //
-  );
+  // Subsequent calls return the same instance 😂
+  final apiService2 = ApiService.init(...);
 
   print(identical(apiService1, apiService2)); // true
 
-  // Use the service
-  await apiService1.get('/users');
+   // Use the singleton instance
+  await ApiService.I.get('/users');
+
+  // Or via the instance
   await apiService2.post('/users', {'name': 'John'});
-}
-```
-
-#### 🔧 Advanced Examples
-
-```dart
-// Complex singleton with dependency injection
-@Singleton()
-abstract class _DatabaseService {
-  _DatabaseService({
-    required this.connectionString,
-    this.maxConnections = 10,
-    this.enableLogging = true,
-    List<String>? initialTables,
-  }) : _tables = initialTables ?? ['users', 'settings'] {
-    _initializeDatabase();
-  }
-
-  final String connectionString;
-  final int maxConnections;
-  final bool enableLogging;
-  final List<String> _tables;
-
-  late final Database _db;
-
-  void _initializeDatabase() {
-    print('Initializing database with ${_tables.length} tables');
-    // Database setup logic
-  }
-
-  Future<List<Map<String, dynamic>>> query(String sql) async {
-    // Implementation
-    return [];
-  }
-}
-
-// Configuration singleton
-@Singleton()
-abstract class _AppConfig {
-  _AppConfig.production() :
-    apiUrl = 'https://api.prod.example.com',
-    debugMode = false,
-    cacheSize = 1000;
-
-  _AppConfig.development() :
-    apiUrl = 'https://api.dev.example.com',
-    debugMode = true,
-    cacheSize = 100;
-
-  final String apiUrl;
-  final bool debugMode;
-  final int cacheSize;
-
-  String get environment => debugMode ? 'development' : 'production';
 }
 ```
 
@@ -1534,97 +1443,6 @@ try {
 }
 ```
 
-#### 🧪 Advanced Usage Patterns
-
-```dart
-// Example 4: Nested validation
-class Address with ValidatorMixin {
-  final String street;
-  final String city;
-  final String zipCode;
-  final String country;
-
-  const Address({
-    required this.street,
-    required this.city,
-    required this.zipCode,
-    required this.country,
-  });
-
-  @override
-  void validator() {
-    if (street.isEmpty) throw ValidationException('Street is required');
-    if (city.isEmpty) throw ValidationException('City is required');
-    if (!zipCode.regMatch(regPatterns.number(type: Number.decimal))) {
-      throw ValidationException('Invalid zip code format');
-    }
-    if (country.length != 2) throw ValidationException('Country must be 2-letter code');
-  }
-}
-
-class User with ValidatorMixin {
-  final PersonName name;
-  final Email email;
-  final Address address;
-  final int age;
-
-  const User({
-    required this.name,
-    required this.email,
-    required this.address,
-    required this.age,
-  });
-
-  @override
-  void validator() {
-    // Validate nested objects
-    if (!name.isValid(reThrow: true)) return; // Will throw if invalid
-    if (!email.isValid(reThrow: true)) return;
-    if (!address.isValid(reThrow: true)) return;
-
-    // Validate own properties
-    if (age < 0 || age > 150) {
-      throw ValidationException('Invalid age: $age');
-    }
-  }
-}
-
-// Example 5: Conditional validation
-class Product with ValidatorMixin {
-  final String name;
-  final double price;
-  final String category;
-  final bool isDigital;
-  final double? weight; // Only required for physical products
-
-  const Product({
-    required this.name,
-    required this.price,
-    required this.category,
-    required this.isDigital,
-    this.weight,
-  });
-
-  @override
-  void validator() {
-    if (name.isEmpty) throw ValidationException('Product name is required');
-    if (price <= 0) throw ValidationException('Price must be positive');
-    if (category.isEmpty) throw ValidationException('Category is required');
-
-    // Conditional validation based on product type
-    if (!isDigital && weight == null) {
-      throw ValidationException('Weight is required for physical products');
-    }
-    if (!isDigital && weight! <= 0) {
-      throw ValidationException('Weight must be positive for physical products');
-    }
-    if (isDigital && weight != null) {
-      throw ValidationException('Digital products should not have weight');
-    }
-  }
-}
-```
-
 #### 💡 Best Practices
 
 | ✅ **Do**                                              | ❌ **Don't**                                      |
@@ -1704,6 +1522,336 @@ class _RegistrationFormState extends State<RegistrationForm> {
   }
 }
 ```
+
+---
+
+
+## 📦 Optional<T> — Type-safe null handling with functional patterns
+
+Replace dangerous `null` with a principled, lightweight `Optional<T>`. The API in this guide is **grounded in the actual implementation** of `optional.dart` you shared (including its `Present` / `Absent` types, `Optional.Do` notation, `map2 / map3`, collection helpers, and error/nullable combinators like `tryCatch`, `flatMapNullable`, `flatMapThrowable`, etc.).
+
+> Import once, use everywhere:
+
+```dart
+import 'package:dart_suite/dart_suite.dart';
+```
+
+---
+
+### Why Optional?
+
+* 🛡️ **Null safety by design** – Impossible to “forget” the empty case; the type system forces you to handle it.
+* 🔗 **Fluent functional API** – `map`, `flatMap`, `filter`, `filterMap`, `ap`, `map2/map3`, `andThen`, etc.
+* 💡 **Explicit branching** – `match` / `fold` keeps control flow obvious and safe.
+* 🧰 **Interops cleanly** – Helpers for `T?` (`Optional.of`, `optional`, `flatMapNullable`, `get()`), thrown errors (`tryCatch`, `flatMapThrowable`), and collections (`traverseList`, `sequenceList`).
+* ⚡ **Tiny wrapper** – Minimal overhead; `Present` holds a `T`, `Absent` holds nothing.
+
+
+### Mental model
+
+`Optional<T>` has two concrete states:
+
+* `Present<T>(value)` – contains a `T`
+* `Absent` – contains no value
+
+Create values with **constructors** or **helpers**:
+
+```dart
+// Direct
+final p = Present(42);                        // Present(42)
+const n = Optional<int>.absent();             // Absent
+
+// Idiomatic helpers (top-level)
+final a = present(42);                        // Present(42)
+final b = absent<int>();                      // Absent
+
+// From nullable + optional predicate
+final o1 = Optional.of('John');               // Present('John')
+final o2 = Optional.of(null);                 // Absent
+final o3 = Optional.of(10, (x) => x > 5);     // Present(10)
+final o4 = Optional.of(3,  (x) => x > 5);     // Absent
+
+// Convenience alias (just calls Optional.of)
+final ox = optional('hi');                    // Present('hi')
+```
+
+---
+
+### Core operations (the ones you’ll use daily)
+
+```dart
+// Pattern match (explicitly handle both branches)
+final greeting = Optional.of('Alice').match(
+  () => 'Hello, stranger!',
+  (name) => 'Hello, $name!',
+);
+
+// map: T -> B
+final len = Optional.of('abc').map((s) => s.length); // Present(3)
+
+// flatMap: T -> Optional<B>
+final email = Optional.of('john')
+  .flatMap((u) => Optional.of('$u@example.com'));    // Present('john@example.com')
+
+// filter: keep only if predicate is true
+final adult = Optional.of(20).filter((n) => n >= 18); // Present(20)
+final child = Optional.of(15).filter((n) => n >= 18); // Absent
+
+// filterMap: T -> Optional<B> (filter + transform in one shot)
+final parsed = Optional.of('123').filterMap(
+  (s) => Optional.tryCatch(() => int.parse(s)),
+); // Present(123)
+
+// Fallbacks
+final v1 = Optional.of(10).orElse(() => 99); // 10  (lazy)
+final v2 = Optional.absent<int>().orElse(() => 99); // 99
+final v3 = Optional.of(10).orElseGet(99); // 10  (eager)
+final v4 = Optional.absent<int>().orElseGet(99); // 99
+
+// Boolean tests
+final presentFlag = Optional.of(1).isPresent; // true
+final absentFlag  = Optional.absent<int>().isAbsent; // true
+```
+
+### Applicative & multi-arg mapping
+
+**`ma**tch` vs `fold`**: `fold(onAbsent, onPresent)` is an alias for `match(onAbsent, onPresent)`. Use whichever you prefer.
+
+
+**`ap` & `pure`**: `ap` applies a function **inside** an `Optional` to a value inside another `Optional`.
+
+```dart
+double sumToDouble(int a, int b) => (a + b).toDouble();
+
+final a = Optional.of(10);
+final b = Optional.of(20);
+
+// Turn `a` into an Optional function we can apply to `b`
+final fn = a.map((x) => (int y) => sumToDouble(x, y));
+
+// Apply it to `b`
+final out = b.ap(fn); // Present(30.0)
+```
+
+### `map2` / `map3`
+
+Convenient when you need both values at once:
+
+```dart
+final fullName = Optional.of('Ada').map2(
+  Optional.of('Lovelace'),
+  (first, last) => '$first $last',
+); // Present('Ada Lovelace')
+
+final area = Optional.of(3).map3(
+  Optional.of(4),
+  Optional.of(5),
+  (a, b, c) => a * b * c,
+); // Present(60)
+```
+
+### `andThen`
+
+Sequence without caring about the previous value:
+
+```dart
+final next = Optional.of('ignored').andThen(() => Optional.of(123)); // Present(123)
+```
+
+### `extend` / `duplicate`
+
+Operate on the container itself (advanced use):
+
+```dart
+final o = Optional.of(5);
+final sz = o.extend((self) => self.isPresent ? 'has!' : 'none'); // Present('has!')
+final dup = o.duplicate(); // Present(Present(5))
+```
+
+---
+
+## Interop with `null` and exceptions (Nullable interop)
+
+```dart
+// Build from nullable (and optional predicate)
+final ok = Optional.of<int?>(42);      // Present(42)
+final no = Optional.of<int?>(null);    // Absent
+
+// Call a nullable-returning function in a flatMap
+final nextNum = Optional.of('42')
+  .flatMapNullable((s) => int.tryParse(s)); // Present(42)
+
+// Get back to nullable (prefer match/orElse when possible)
+final String? maybe = Optional.of('x').get(); // 'x'
+final String? none  = Optional.absent<String>().get(); // null
+```
+
+### Exceptions as values
+
+```dart
+// Wrap a throwing computation
+final parsed = Optional.tryCatch(() => int.parse('123'));     // Present(123)
+final failed = Optional.tryCatch(() => int.parse('oops'));    // Absent
+
+// Map with a function that may throw
+final toInt = Optional.of('99').flatMapThrowable((s) => int.parse(s)); // Present(99)
+```
+
+
+### `traverseList` / `traverseListWithIndex`
+
+Map a list to `Optional`s and collect **all** results, failing fast if any item is `Absent`.
+
+```dart
+final inputs = ['1', '2', 'invalid', '4'];
+
+Optional<List<int>> parsed = Optional.traverseList(inputs, (s) =>
+  Optional.tryCatch(() => int.parse(s)),
+); // Absent (because 'invalid' fails)
+
+final goods = ['1', '2', '3', '4'];
+final okAll = Optional.traverseList(goods, (s) =>
+  Optional.tryCatch(() => int.parse(s)),
+); // Present([1,2,3,4])
+
+// Need indices in your mapping?
+Optional.traverseListWithIndex(goods, (s, i) =>
+  (i % 2 == 0) ? Optional.tryCatch(() => int.parse(s))
+               : Optional.absent(),
+); // Absent (because odd indexes absent)
+```
+
+### `sequenceList`
+
+Turn `List<Optional<A>>` into `Optional<List<A>>`:
+
+```dart
+final list = [Optional.of(1), Optional.of(2), Optional.of(3)];
+final seq  = Optional.sequenceList(list); // Present([1,2,3])
+
+final withHole = [Optional.of(1), Optional.absent<int>(), Optional.of(3)];
+final none     = Optional.sequenceList(withHole); // Absent
+```
+
+
+### Predicates & partitioning
+
+```dart
+// Lift a predicate to Optional
+final nonEmpty = Optional.fromPredicate('abc', (s) => s.isNotEmpty); // Present('abc')
+
+// Map if predicate passes
+final lengthWhenNonEmpty = Optional.fromPredicateMap<String, int>(
+  'abc',
+  (s) => s.isNotEmpty,
+  (s) => s.length,
+); // Present(3)
+
+// Split into (leftWhenFalse, rightWhenTrue)
+final (left, right) = Optional.of(10).partition((n) => n.isEven);
+// left  = Absent, right = Present(10)
+```
+
+### The “Do notation” (ergonomic chaining)
+
+`Optional.Do` lets you write sequential code and **extract** from `Optional`s using a special adapter (`$`). If any extracted value is `Absent`, the whole block becomes `Absent` automatically.
+
+```dart
+final res = Optional.Do(($) {
+  final user   = $(findUserById(123));           // Optional<User>
+  final email  = $(getVerifiedEmail(user));      // Optional<String>
+  final lower  = email.toLowerCase();
+  return lower;
+});
+```
+
+> Under the hood it uses a private throw/catch on an adapter; that’s exactly what the code in `optional.dart` implements.
+
+
+### Validation (no `if` pyramids)
+
+```dart
+class Registration {
+  final String email;
+  final String password;
+  final int age;
+
+  Registration({required this.email, required this.password, required this.age});
+
+  Optional<String> validateEmail() =>
+      Optional.fromPredicate(email, (e) => RegExp(r'^[^@]+@[^@]+\.[^@]+$').hasMatch(e));
+
+  Optional<String> validatePassword() =>
+      Optional.fromPredicate(password, (p) => p.length >= 8);
+
+  Optional<int> validateAge() =>
+      Optional.fromPredicate(age, (a) => a >= 13 && a <= 120);
+
+  Optional<Registration> validate() =>
+      validateEmail()
+        .andThen(validatePassword)
+        .andThen(validateAge)
+        .map((_) => this);
+}
+```
+
+### API cheat-sheet (as implemented)
+
+**Creation**
+
+* `Present(value)` / `const Optional.absent()`
+* `present<T>(t)` / `absent<T>()`
+* `Optional.of([T? value, Predicate<T>? predicate])`
+* `optional([value, predicate])` (alias to `Optional.of`)
+* `Optional.fromPredicate(value, predicate)`
+* `Optional.fromPredicateMap(value, predicate, f)`
+* `Optional.tryCatch(() => ...)`
+* `Optional.flatten(Optional<Optional<T>> m)`
+
+**Core**
+
+* `match(onAbsent, onPresent)` / `fold(onAbsent, onPresent)`
+* `map(f)` / `flatMap(f)` / `flatMapNullable(f)` / `flatMapThrowable(f)`
+* `filter(pred)` / `filterMap(f)` / `partition(pred)`
+* `orElse(() => t)` / `orElseGet(t)` / `or(() => Optional<T>)`
+* `isPresent` / `isAbsent` / `get()` (→ `T?`)
+
+**Applicative & friends**
+
+* `ap(Optional<B Function(T)>)` / `pure(b)`
+* `map2(other, (a, b) => ...)`
+* `map3(b, c, (a, b, c) => ...)`
+* `andThen(() => Optional<B>)`
+* `extend(f)` / `duplicate()`
+
+**Collections**
+
+* `Optional.traverseList(list, f)`
+* `Optional.traverseListWithIndex(list, (a, i) => ...)`
+* `Optional.sequenceList(list)`
+
+**Do notation**
+
+* `Optional.Do(($) { final x = $(opt); ... return ...; })`
+
+**Equality & debug**
+
+* `Present(a) == Present(b)` if `a == b`
+* `Absent == Absent`
+* `toString()`: `Present(value)` / `Absent`
+
+---
+
+## Best practices
+
+| ✅ Do                                                     | ❌ Don’t                                                        |
+| -------------------------------------------------------- | -------------------------------------------------------------- |
+| Use `match`/`fold` to handle both branches               | Call `.get()` and assume non-null                              |
+| Prefer `flatMap` to avoid nested `Optional<Optional<T>>` | Create `Optional<T?>` unless you truly need nested nullability |
+| Use `filter`/`filterMap` instead of `if` chains          | Mix `null` and `Optional` haphazardly                          |
+| Wrap throwing code with `tryCatch` or `flatMapThrowable` | Throw inside business logic and forget to catch                |
+| Use `traverseList/sequenceList` for batch workflows      | Loop manually and forget to short-circuit on failure           |
+| Reach for `map2`/`map3` for multi-input logic            | Chain deep pyramids of `flatMap` when combining many values    |
 
 ---
 
