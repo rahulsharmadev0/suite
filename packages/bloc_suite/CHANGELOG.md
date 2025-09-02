@@ -1,4 +1,9 @@
 # Changelog
+## 0.0.8 - Patch 📃
+### 🎉 Upgrade to bloc_suite ^0.0.8
+### Update Documentation
+
+- Added examples and improved documentation
 
 ## 0.0.7 - Patch 📃
 

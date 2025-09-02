@@ -14,6 +14,31 @@
 
 ---
 
+<p align="center">
+  <strong style="font-size:22px; display:block; margin-bottom:10px;">
+    📦 Other Packages in This Suite
+  </strong>
+</p>
+  
+<p align="center">🧩 <a href="https://pub.dev/packages/dart_suite"><strong>dart_suite</strong></a> — A versatile Dart package offering a comprehensive collection of utilities, extensions, and data structures for enhanced development productivity.</p>
+<p align="center">⚙️ <a href="https://pub.dev/packages/gen_suite"><strong>gen_suite</strong></a> — Code-generation tools and annotations to automate boilerplate and speed up development.</p>
+
+<p align="center">
+  <a href="https://pub.dev/packages/dart_suite">
+    <img src="https://img.shields.io/pub/v/dart_suite.svg?label=dart_suite&color=1f7aed&logo=dart" alt="dart_suite" />
+  </a>
+  &nbsp;&nbsp;
+  <a href="https://pub.dev/packages/gen_suite">
+    <img src="https://img.shields.io/pub/v/gen_suite.svg?label=gen_suite&color=ffcc00&logo=google" alt="gen_suite" />
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/rahulsharmadev0/suite"><strong>🔎 Explore the full suite →</strong></a>
+</p>
+
+---
+# Bloc Suite
 Bloc Suite is a comprehensive package that extends the functionality of the Flutter Bloc library. It provides additional utilities, widgets, and patterns to simplify state management in Flutter applications.
 
 ## Features

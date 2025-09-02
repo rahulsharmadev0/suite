@@ -1,6 +1,6 @@
+import 'package:dart_suite/dart_suite.dart';
 
 part 'extension.dart';
-
 
 /// Returns the given `a`.
 ///
@@ -17,7 +17,6 @@ part 'extension.dart';
 /// ```
 T identity<T>(T a) => a;
 
-
 /// Return a `Present(t)`.
 ///
 /// Shortcut for `Optional.of(r)`.
@@ -28,28 +27,27 @@ Optional<T> present<T>(T t) => Present(t);
 /// Shortcut for `Optional.absent()`.
 Optional<T> absent<T>() => const Optional.absent();
 
-/// Return [Absent] if `t` is `null`, [Present] otherwise.
-///
-/// Same as initializing `Optional.fromNullable(t)`.
-Optional<T> optionOf<T>(T? t) => Optional.fromNullable(t);
-
-/// Return [Present] of `value` when `predicate` applied to `value` returns `true`,
-/// [Absent] otherwise.
-///
-/// Same as initializing `Optional.fromPredicate(value, predicate)`.
-Optional<T> optional<T>(T value, bool Function(T) predicate) =>
-    Optional.fromPredicate(value, predicate);
+/// Return an [Optional] containing `value` if not `null`, [Absent] otherwise.
+/// If `predicate` is provided, return [Present] only if `predicate(value)` is `true
+/// and `value` is not `null`, [Absent] otherwise.
+/// ```dart
+/// final Optional<String> mStr1 = optional('name'); // Present('name')
+/// final Optional<String> mStr2 = optional(null); // Absent
+/// final Optional<int> mInt1 = optional(10, (i) => i > 5 // Present(10)
+/// final Optional<int> mInt2 = optional(3, (i) => i > 5); // Absent
+/// ```
+Optional<T> optional<T>([T? value, Predicate<T>? predicate]) =>
+    Optional.of(value, predicate);
 
 final class _OptionThrow {
   const _OptionThrow();
 }
 
 typedef DoAdapterOption = A Function<A>(Optional<A>);
-A _doAdapter<A>(Optional<A> optional) => 
-    optional.getOrElse(() => throw const _OptionThrow());
+A _doAdapter<A>(Optional<A> optional) =>
+    optional.orElse(() => throw const _OptionThrow());
 
 typedef DoFunctionOption<A> = A Function(DoAdapterOption $);
-
 
 // `Optional<T> implements Functor<OptionHKT, T>` expresses correctly the
 // return type of the `map` function as `HKT<OptionHKT, B>`.
@@ -98,7 +96,6 @@ sealed class Optional<T> {
   /// [🥚].map((🥚) => 👨‍🍳(🥚)) -> [🍳]
   /// [_].map((🥚) => 👨‍🍳(🥚)) -> [_]
   /// ```
-  
   Optional<B> map<B>(B Function(T t) f) => ap(pure(f));
 
   /// Apply the function contained inside `a` to change the value of type `T` to
@@ -119,14 +116,14 @@ sealed class Optional<T> {
   /// /// Using `ap`, we get the final `Optional<double>` that we want 🚀
   /// final result = b.ap(map);
   /// ```
-  
+
   Optional<B> ap<B>(covariant Optional<B Function(T t)> a) => a.match(
         () => Optional<B>.absent(),
         (f) => map(f),
       );
 
   /// Return a [Present] containing the value `b`.
-  
+
   Optional<B> pure<B>(B b) => Present(b);
 
   /// Used to chain multiple functions that return a [Optional].
@@ -149,31 +146,23 @@ sealed class Optional<T> {
   /// ```
   /// 👇
   /// ```dart
-  /// [😀].flatMap(
-  ///     (😀) => [👻(😀)]
-  ///     ) -> [😱]
+  /// final a = Optional.of(1);
+  /// final inc = a.flatMap((x) => Optional.of(x + 1)); // Present(2)
   ///
-  /// [😀].flatMap(
-  ///     (😀) => [👻(😀)]
-  ///     ).flatMap(
-  ///         (😱) => [👨‍⚕️(😱)]
-  ///         ) -> [🤕]
+  /// final none = Optional.absent<int>();
+  /// final stillNone = none.flatMap((x) => Optional.of(x + 1)); // Absent
   ///
-  /// [😀].flatMap(
-  ///     (😀) => [_]
-  ///     ).flatMap(
-  ///         (_) => [👨‍⚕️(_)]
-  ///         ) -> [_]
-  ///
-  /// [_].flatMap(
-  ///     (😀) => [👻(😀)]
-  ///     ) -> [_]
+  /// // Chaining multiple flatMap calls
+  /// final chained = Optional.of(1)
+  ///     .flatMap((x) => Optional.of(x + 1))
+  ///     .flatMap((y) => Optional.of(y * 2)); // Present(4)
   /// ```
-  
+  /// ```
+
   Optional<B> flatMap<B>(covariant Optional<B> Function(T t) f) =>
       match<Optional<B>>(() => Optional<B>.absent(), (t) => f(t));
 
-  /// Return a new [Optional] that calls [Optional.fromNullable] on the result of of the given function [f].
+  /// Return a new [Optional] that calls [Optional.of] on the result of of the given function [f].
   ///
   /// ```dart
   /// expect(
@@ -186,8 +175,7 @@ sealed class Optional<T> {
   ///   Optional.of(456),
   /// );
   /// ```
-  Optional<B> flatMapNullable<B>(B? Function(T t) f) =>
-      flatMap((t) => Optional.fromNullable(f(t)));
+  Optional<B> flatMapNullable<B>(B? Function(T t) f) => flatMap((t) => Optional.of(f(t)));
 
   /// Return a new [Optional] that calls [Optional.tryCatch] with the given function [f].
   ///
@@ -203,23 +191,23 @@ sealed class Optional<T> {
 
   /// Change the value of [Optional] from type `T` to type `Z` based on the
   /// value of `Optional<T>` using function `f`.
-  
+
   Optional<Z> extend<Z>(Z Function(Optional<T> t) f) =>
       match<Optional<Z>>(() => Optional<Z>.absent(), (_) => Present(f(this)));
 
   /// Wrap this [Optional] inside another [Optional].
-  
+
   Optional<Optional<T>> duplicate() => extend(identity);
 
   /// If this [Optional] is a [Present] and calling `f` returns `true`, then return this [Present].
   /// Otherwise return [Absent].
-  
+
   Optional<T> filter(bool Function(T t) f) =>
       flatMap((t) => f(t) ? this : const Optional.absent());
 
   /// If this [Optional] is a [Present] and calling `f` returns [Present], then return this [Present].
   /// Otherwise return [Absent].
-  
+
   Optional<Z> filterMap<Z>(Optional<Z> Function(T t) f) =>
       match<Optional<Z>>(() => Optional<Z>.absent(), (t) => f(t));
 
@@ -236,20 +224,19 @@ sealed class Optional<T> {
   /// [🍌].andThen(() => [🍎]) -> [🍎]
   /// [_].andThen(() => [🍎]) -> [_]
   /// ```
-  
-  Optional<B> andThen<B>(covariant Optional<B> Function() then) =>
-      flatMap((_) => then());
+
+  Optional<B> andThen<B>(covariant Optional<B> Function() then) => flatMap((_) => then());
 
   /// Change type of this [Optional] based on its value of type `T` and the
   /// value of type `C` of another [Optional].
-  
+
   Optional<D> map2<C, D>(covariant Optional<C> mc, D Function(T t, C c) f) =>
       flatMap((a) => mc.map((c) => f(a, c)));
 
   /// Change type of this [Optional] based on its value of type `T`, the
   /// value of type `C` of a second [Optional], and the value of type `D`
   /// of a third [Optional].
-  
+
   Optional<E> map3<C, D, E>(covariant Optional<C> mc, covariant Optional<D> md,
           E Function(T t, C c, D d) f) =>
       flatMap((a) => mc.flatMap((c) => md.map((d) => f(a, c, d))));
@@ -284,13 +271,45 @@ sealed class Optional<T> {
       match(onAbsent, onPresent);
 
   /// Return `true` when value is [Present].
-  bool isPresent() => match(() => false, (_) => true);
+  bool get isPresent => match(() => false, (_) => true);
 
   /// Return `true` when value is [Absent].
-  bool isAbsent() => match(() => true, (_) => false);
+  bool get isAbsent => match(() => true, (_) => false);
 
   /// Return value of type `T` when this [Optional] is a [Present], `null` otherwise.
-  T? toNullable() => match<T?>(() => null, identity);
+  /// ```dart
+  /// [🍌].get() -> 🍌
+  /// [_].get() -> null
+  /// ```
+  T? get() => match<T?>(() => null, identity);
+
+  /// If this [Optional] is a [Present] then return the value inside the [Optional].
+  /// Otherwise return the result of `orElse`.
+  /// ```dart
+  /// [🍌].orElse(() => 🍎) -> 🍌
+  /// [_].orElse(() => 🍎) -> 🍎
+  ///
+  ///  👆 same as 👇
+  ///
+  /// [🍌].match(() => 🍎, (🍌) => 🍌)
+  /// ```
+  T orElse(T Function() fallback) => match(fallback, identity);
+
+  /// If this [Optional] is a [Present] then return the value inside the [Optional].
+  /// ```dart
+  /// [🍌].orElseGet(🍎) -> 🍌
+  /// [_].orElseGet(🍎) -> 🍎
+  /// ```
+  T orElseGet(T value) => match(() => value, identity);
+
+  /// Return the current [Optional] if it is a [Present], otherwise return the result of `orElse`.
+  ///
+  /// Used to provide an **alt**ernative [Optional] in case the current one is [Absent].
+  /// ```dart
+  /// [🍌].or(() => [🍎]) -> [🍌]
+  /// [_].or(() => [🍎]) -> [🍎]
+  /// ```
+  Optional<T> or(Optional<T> Function() orElse) => this is Present<T> ? this : orElse();
 
   /// {@template fpdart_traverse_list_option}
   /// Map each element in the list to an [Optional] using the function `f`,
@@ -320,9 +339,7 @@ sealed class Optional<T> {
   ///
   /// Same as `Optional.traverseListWithIndex` but without `index` in the map function.
   static Optional<List<B>> traverseList<A, B>(
-    List<A> list,
-    Optional<B> Function(A a) f,
-  ) =>
+          List<A> list, Optional<B> Function(A a) f) =>
       traverseListWithIndex<A, B>(list, (a, _) => f(a));
 
   /// {@template fpdart_sequence_list_option}
@@ -330,15 +347,12 @@ sealed class Optional<T> {
   ///
   /// If any of the [Optional] in the [List] is [Absent], then the result is [Absent].
   /// {@endtemplate}
-  static Optional<List<A>> sequenceList<A>(
-    List<Optional<A>> list,
-  ) =>
+  static Optional<List<A>> sequenceList<A>(List<Optional<A>> list) =>
       traverseList(list, identity);
-
 
   /// Return [Present] of `value` when `predicate` applied to `value` returns `true`,
   /// [Absent] otherwise.
-  factory Optional.fromPredicate(T value, bool Function(T t) predicate) =>
+  factory Optional.fromPredicate(T value, Predicate<T> predicate) =>
       predicate(value) ? Present(value) : Optional.absent();
 
   /// Return [Present] of type `B` by calling `f` with `value` when `predicate` applied to `value` is `true`,
@@ -353,20 +367,20 @@ sealed class Optional<T> {
   /// );
   /// ```
   static Optional<B> fromPredicateMap<A, B>(
-          A value, bool Function(A a) predicate, B Function(A a) f) =>
+          A value, Predicate<A> predicate, B Function(A a) f) =>
       predicate(value) ? Present(f(value)) : Optional.absent();
 
   /// Return a [Absent].
   const factory Optional.absent() = Absent;
 
-  /// Return a `Present(a)`.
-  const factory Optional.of(T t) = Present<T>;
-
   /// Flat a [Optional] contained inside another [Optional] to be a single [Optional].
   factory Optional.flatten(Optional<Optional<T>> m) => m.flatMap(identity);
 
   /// Return [Absent] if `a` is `null`, [Present] otherwise.
-  factory Optional.fromNullable(T? t) => t == null ? Optional.absent() : Present(t);
+  factory Optional.of([T? value, Predicate<T>? predicate]) =>
+      predicate != null && value != null
+          ? Optional.fromPredicate(value, predicate)
+          : (value == null ? Optional.absent() : Present(value));
 
   /// Try to run `f` and return `Present(a)` when no error are thrown, otherwise return `Absent`.
   factory Optional.tryCatch(T Function() f) {
@@ -376,15 +390,6 @@ sealed class Optional<T> {
       return const Optional.absent();
     }
   }
-
-  /// Converts from Json.
-  ///
-  /// Json serialization support for `json_serializable` with `@JsonSerializable`.
-  factory Optional.fromJson(
-    dynamic json,
-    T Function(dynamic json) fromJsonT,
-  ) =>
-      json != null ? Optional.tryCatch(() => fromJsonT(json)) : Optional.absent();
 }
 
 class Present<T> extends Optional<T> {
@@ -394,81 +399,62 @@ class Present<T> extends Optional<T> {
   /// Extract value of type `T` inside the [Present].
   T get value => _value;
 
-  
   @override
   Optional<D> map2<C, D>(covariant Optional<C> mc, D Function(T t, C c) f) =>
       flatMap((a) => mc.map((c) => f(a, c)));
 
-  
   @override
   Optional<E> map3<C, D, E>(covariant Optional<C> mc, covariant Optional<D> md,
           E Function(T t, C c, D d) f) =>
       flatMap((a) => mc.flatMap((c) => md.map((d) => f(a, c, d))));
 
-  
   @override
   Optional<B> map<B>(B Function(T t) f) => Present(f(_value));
 
-  
   @override
   Optional<B> flatMap<B>(covariant Optional<B> Function(T t) f) => f(_value);
 
-  
   @override
   B match<B>(B Function() onAbsent, B Function(T t) onPresent) => onPresent(_value);
 
-  
   @override
   Optional<Z> extend<Z>(Z Function(Optional<T> t) f) => Present(f(this));
 
-  
   @override
-  bool isPresent() => true;
+  bool get isPresent => true;
 
-  
   @override
-  bool isAbsent() => false;
+  bool get isAbsent => false;
 
-  
   @override
   Optional<T> filter(bool Function(T t) f) => f(_value) ? this : Optional.absent();
 
-  
   @override
   Optional<Z> filterMap<Z>(Optional<Z> Function(T t) f) => f(_value).match(
         () => const Optional.absent(),
         Present.new,
       );
 
-  
   @override
-  T toNullable() => _value;
+  T get() => _value;
 
-  
-@override
-bool operator ==(Object other) =>
-    other.runtimeType == runtimeType &&
-    other is Present<T> &&
-    other._value == _value;
-  
+  @override
+  bool operator ==(Object other) =>
+      other.runtimeType == runtimeType && other is Present<T> && other._value == _value;
+
   @override
   int get hashCode => _value.hashCode;
 
-  
   @override
   String toString() => 'Present($_value)';
-
 }
 
 class Absent extends Optional<Never> {
   const Absent();
 
-  
   @override
-  Optional<D> map2<C, D>(covariant Optional<C> mc, D Function(Never t, C c) f) =>
-      this;
+  Optional<D> map2<C, D>(covariant Optional<C> mc, D Function(Never t, C c) f) => this;
 
-  
   @override
   Optional<E> map3<C, D, E>(
     covariant Optional<C> mc,
@@ -477,48 +463,36 @@ class Absent extends Optional<Never> {
   ) =>
       this;
 
-  
   @override
   Optional<B> map<B>(B Function(Never t) f) => this;
 
-  
   @override
   Optional<B> flatMap<B>(covariant Optional<B> Function(Never t) f) => this;
 
-  
   @override
   B match<B>(B Function() onAbsent, B Function(Never t) onPresent) => onAbsent();
 
-  
   @override
   Optional<Z> extend<Z>(Z Function(Optional<Never> t) f) => const Optional.absent();
 
-  
   @override
-  bool isPresent() => false;
+  bool get isPresent => false;
 
-  
   @override
-  bool isAbsent() => true;
+  bool get isAbsent => true;
 
-  
   @override
   Optional<Z> filterMap<Z>(Optional<Z> Function(Never t) f) => const Optional.absent();
 
-  
   @override
   bool operator ==(Object other) => other is Absent;
 
-  
   @override
-  Null toNullable() => null;
+  Null get() => null;
 
-  
   @override
   int get hashCode => 0;
 
-  
   @override
   String toString() => 'Absent';
-
 }

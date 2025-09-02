@@ -13,6 +13,6 @@ void testImmutableMap<K, V>(
     objectDeepEquality(originalSource, source),
     true,
     reason:
-        "The provided element is not immutable: ${source} should be ${originalSource}",
+        "The provided element is not immutable: $source should be $originalSource",
   );
 }

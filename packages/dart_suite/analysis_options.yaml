@@ -2,3 +2,4 @@ include: package:lints/recommended.yaml
 analyzer:
   errors:
     provide_deprecation_message: ignore
+    unintended_html_in_doc_comment: ignore

@@ -5,18 +5,16 @@ import 'utils/utils.dart';
 void main() {
   group('Optional', () {
     group('[Property-based testing]', () {
-
       group('map', () {
         Glados(any.optionInt).test('should keep the same type (Present or Absent)',
             (option) {
           final r = option.map((id) => id + 1);
-          expect(option.isPresent(), r.isPresent());
-          expect(option.isAbsent(), r.isAbsent());
+          expect(option.isPresent, r.isPresent);
+          expect(option.isAbsent, r.isAbsent);
         });
 
-        Glados2(any.optionInt, any.int)
-            .test('should updated the value inside Present, or stay Absent',
-                (option, value) {
+        Glados2(any.optionInt, any.int).test(
+            'should updated the value inside Present, or stay Absent', (option, value) {
           final r = option.map((n) => n + value);
           option.match(
             () {
@@ -33,8 +31,7 @@ void main() {
 
       group('traverseList', () {
         Glados(any.list(any.int)).test(
-            'should keep the same structure and content of the original list',
-            (input) {
+            'should keep the same structure and content of the original list', (input) {
           final result = Optional.traverseList(input, Optional<int>.of);
           result.matchTestSome((t) {
             expect(t, input);
@@ -51,8 +48,7 @@ void main() {
 
     test('map2', () {
       final option = Optional.of(10);
-      final map =
-          option.map2<String, int>(Optional.of('abc'), (a, b) => a + b.length);
+      final map = option.map2<String, int>(Optional.of('abc'), (a, b) => a + b.length);
       map.matchTestSome((present) => expect(present, 13));
     });
 
@@ -133,13 +129,13 @@ void main() {
     group('extend', () {
       test('Present', () {
         final option = Optional.of(10);
-        final value = option.extend((t) => t.isPresent() ? 'valid' : 'invalid');
+        final value = option.extend((t) => t.isPresent ? 'valid' : 'invalid');
         value.matchTestSome((present) => expect(present, 'valid'));
       });
 
       test('Absent', () {
         final option = Optional<int>.absent();
-        final value = option.extend((t) => t.isPresent() ? 'valid' : 'invalid');
+        final value = option.extend((t) => t.isPresent ? 'valid' : 'invalid');
         expect(value, isA<Absent>());
       });
     });
@@ -215,32 +211,6 @@ void main() {
       });
     });
 
-
-    group('fromJson', () {
-      test('int', () {
-        final option = Optional<int>.fromJson(10, (a) => a as int);
-        option.matchTestSome((present) => expect(present, 10));
-      });
-
-      test('DateTime', () {
-        final now = DateTime.now();
-        final option = Optional<DateTime>.fromJson(
-            now.toIso8601String(), (a) => DateTime.parse(a as String));
-        option.matchTestSome((present) => expect(present, now));
-      });
-
-      test('DateTime failure', () {
-        final option = Optional<DateTime>.fromJson(
-            "fail", (a) => DateTime.parse(a as String));
-        expect(option, isA<Absent>());
-      });
-
-      test('null', () {
-        final option = Optional<int>.fromJson(null, (a) => a as int);
-        expect(option, isA<Absent>());
-      });
-    });
-
     group('fromPredicate', () {
       test('Present', () {
         final option = Optional<int>.fromPredicate(10, (a) => a > 5);
@@ -291,20 +261,19 @@ void main() {
 
     test('isPresent', () {
       final option = Optional.of(10);
-      expect(option.isPresent(), true);
-      expect(option.isAbsent(), false);
+      expect(option.isPresent, true);
+      expect(option.isAbsent, false);
     });
 
     test('isAbsent', () {
       final option = Optional<int>.absent();
-      expect(option.isAbsent(), true);
-      expect(option.isPresent(), false);
+      expect(option.isAbsent, true);
+      expect(option.isPresent, false);
     });
 
-
     test('fromNullable', () {
-      final m1 = Optional<int>.fromNullable(10);
-      final m2 = Optional<int>.fromNullable(null);
+      final m1 = Optional<int>.of(10);
+      final m2 = Optional<int>.of(null);
       expect(m1, isA<Present>());
       expect(m2, isA<Absent>());
     });
@@ -316,13 +285,12 @@ void main() {
       expect(m2, isA<Absent>());
     });
 
-
     test('toNullable', () {
       final m1 = Optional.of(10);
       final m2 = Optional<int>.absent();
-      expect(m1.toNullable(), 10);
-      expect(m1.toNullable(), isA<int?>());
-      expect(m2.toNullable(), null);
+      expect(m1.get(), 10);
+      expect(m1.get(), isA<int?>());
+      expect(m2.get(), null);
     });
 
     test('pure', () {
@@ -396,8 +364,7 @@ void main() {
     group('traverseList', () {
       test('Present', () {
         final list = [1, 2, 3, 4, 5, 6];
-        final result =
-            Optional.traverseList<int, String>(list, (a) => present("$a"));
+        final result = Optional.traverseList<int, String>(list, (a) => present("$a"));
         result.matchTestSome((t) {
           expect(t, ["1", "2", "3", "4", "5", "6"]);
         });
@@ -416,8 +383,8 @@ void main() {
     group('traverseListWithIndex', () {
       test('Present', () {
         final list = [1, 2, 3, 4, 5, 6];
-        final result = Optional.traverseListWithIndex<int, String>(
-            list, (a, i) => present("$a$i"));
+        final result =
+            Optional.traverseListWithIndex<int, String>(list, (a, i) => present("$a$i"));
         result.matchTestSome((t) {
           expect(t, ["10", "21", "32", "43", "54", "65"]);
         });
@@ -432,7 +399,6 @@ void main() {
         expect(result, isA<Absent>());
       });
     });
-
 
     test('Present value', () {
       const m = Present(10);
@@ -484,16 +450,14 @@ void main() {
 
   group('Do Notation', () {
     test('should traverse over a list', () async {
-      const testOption = const Optional<List<String?>>.of(
-        ['/', '/test', null],
-      );
+      final testOption = Optional<List<String?>>.of(const ['/', '/test', null]);
 
       Optional<List<Uri>> doNotation = Optional.Do(
         ($) {
           List<String?> optionList = $(testOption);
-          return $(optionList.traverseOption(
-            (stringValue) => optionOf(stringValue).flatMap(
-              (uri) => optionOf(
+          return $(optionList.traverseOptional(
+            (stringValue) => optional(stringValue).flatMap(
+              (uri) => optional(
                 Uri.tryParse(uri),
               ),
             ),
@@ -505,16 +469,16 @@ void main() {
     });
 
     test('should return the correct value', () {
-      final doOption = Optional.Do((_) => _(Optional.of(10)));
+      final doOption = Optional.Do((f) => f(Optional.of(10)));
       doOption.matchTestSome((t) {
         expect(t, 10);
       });
     });
 
     test('should extract the correct values', () {
-      final doOption = Optional.Do((_) {
-        final a = _(Optional.of(10));
-        final b = _(Optional.of(5));
+      final doOption = Optional.Do((f) {
+        final a = f(Optional.of(10));
+        final b = f(Optional.of(5));
         return a + b;
       });
       doOption.matchTestSome((t) {
@@ -523,10 +487,10 @@ void main() {
     });
 
     test('should return Absent if any Optional is Absent', () {
-      final doOption = Optional.Do((_) {
-        final a = _(Optional.of(10));
-        final b = _(Optional.of(5));
-        final c = _(Optional<int>.absent());
+      final doOption = Optional.Do((f) {
+        final a = f(Optional.of(10));
+        final b = f(Optional.of(5));
+        final c = f(Optional<int>.absent());
         return a + b + c;
       });
 
@@ -534,8 +498,8 @@ void main() {
     });
 
     test('should rethrow if throw is used inside Do', () {
-      final doOption = () => Optional.Do((_) {
-            _(Optional.of(10));
+      Optional<Never> doOption() => Optional.Do((f) {
+            f(Optional.of(10));
             throw UnimplementedError();
           });
 
@@ -543,8 +507,8 @@ void main() {
     });
 
     test('should rethrow if Absent is thrown inside Do', () {
-      final doOption = () => Optional.Do((_) {
-            _(Optional.of(10));
+      Optional<Never> doOption() => Optional.Do((f) {
+            f(Optional.of(10));
             throw Absent();
           });
 
@@ -552,8 +516,8 @@ void main() {
     });
 
     test('should throw if the error is not Absent', () {
-      final doOption = () => Optional.Do((_) {
-            _(Optional.of(10));
+      Optional<Never> doOption() => Optional.Do((f) {
+            f(Optional.of(10));
             throw UnimplementedError();
           });
 
@@ -562,9 +526,9 @@ void main() {
 
     test('should no execute past the first Absent', () {
       var mutable = 10;
-      final doOptionNone = Optional.Do((_) {
-        final a = _(Optional.of(10));
-        final b = _(Optional<int>.absent());
+      final doOptionNone = Optional.Do((f) {
+        final a = f(Optional.of(10));
+        final b = f(Optional<int>.absent());
         mutable += 10;
         return a + b;
       });
@@ -572,8 +536,8 @@ void main() {
       expect(mutable, 10);
       expect(doOptionNone, isA<Absent>());
 
-      final doOptionSome = Optional.Do((_) {
-        final a = _(Optional.of(10));
+      final doOptionSome = Optional.Do((f) {
+        final a = f(Optional.of(10));
         mutable += 10;
         return a;
       });
