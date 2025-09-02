@@ -1,3 +1,11 @@
+
+## 0.0.6
+### Added
+- `Optional<T>` type for representing optional values and powered with channel-like operations. Inspired by Java's Optional and Rust's Option.
+### Changed
+- Updated README.md with usage examples for `Optional<T>`.
+- Bug fixes and performance improvements.
+
 ## 0.0.5
 ### Added
 - @singleton annotation for generating singleton classes, necessary for gen_suite package functionality.

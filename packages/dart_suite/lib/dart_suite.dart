@@ -4,4 +4,3 @@ library dart_suite;
 
 export 'src/extensions.dart';
 export 'src/utility.dart';
-
