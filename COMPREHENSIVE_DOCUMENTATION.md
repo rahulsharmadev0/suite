@@ -342,4 +342,291 @@ final rateLimitedApi = (() => sendAnalytics()).throttle(Duration(seconds: 5));
 
 **Overview**: Timeago converts dates and timestamps into human-readable relative time formats like "2 hours ago", "in 3 days", making temporal information more intuitive for users.
 
-**Technical Explanation**: Timeago calculates the difference between a given DateTime and the current time, then maps these differences to appropriate human-readable strings using configurable symbol data. It supports both past and future times, handles various time units (seconds to years), and provides localization support through customizable symbol sets.
+**Technical Explanation**: Timeago calculates the difference between a given DateTime and the current time, then maps these differences to appropriate human-readable strings using configurable symbol data. It supports both past and future times, handles various time units (seconds to years), and provides localization support through customizable symbol sets. The implementation uses pattern matching to determine the appropriate time unit and format.
+
+**Usage Examples**:
+
+1. **Basic Time Formatting**:
+```dart
+// Format past times
+final postTime = DateTime.now().subtract(Duration(hours: 2));
+print(postTime.timeago().format()); // "2 hours ago"
+
+final oldPost = DateTime(2023, 1, 15);
+print(oldPost.timeago().format()); // "11 months ago" (from current date)
+
+// Duration-based formatting
+final duration = Duration(minutes: 30);
+print(duration.timeago().format()); // "30 minutes"
+
+// Just now handling (less than 10 seconds)
+final recent = DateTime.now().subtract(Duration(seconds: 5));
+print(recent.timeago().format()); // "just now"
+```
+
+2. **Advanced Configuration and Localization**:
+```dart
+class SocialMediaPost {
+  final DateTime createdAt;
+  final String content;
+  
+  SocialMediaPost(this.createdAt, this.content);
+  
+  String get timeDisplay {
+    final timeago = createdAt.timeago();
+    
+    // Enable short format for compact display
+    timeago.enableShort = true;  // "2h" instead of "2 hours"
+    timeago.enableSuffix = false; // Remove "ago" suffix
+    
+    return timeago.format();
+  }
+  
+  String get fullTimeDisplay {
+    return createdAt.timeago(locale: 'en_US').format();
+  }
+}
+
+// Usage in UI
+class PostWidget extends StatelessWidget {
+  final SocialMediaPost post;
+  
+  const PostWidget(this.post);
+  
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Column(
+        children: [
+          Text(post.content),
+          Text(
+            post.timeDisplay, // "2h", "1d", etc.
+            style: Theme.of(context).textTheme.caption,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// Custom symbol configuration
+final customTimeago = Timeago.since(
+  DateTime.now().subtract(Duration(days: 5)),
+  symbol: TimeagoSymbol(
+    JUST_NOW: TimeagoSymbolValue('now', 'n'),
+    SECONDS: TimeagoSymbolValue('seconds', 's'),
+    // ... other custom symbols
+  ),
+);
+```
+
+**Notes/Best Practices**:
+- Use `enableShort = true` for compact UI elements (mobile, cards, badges)
+- Disable suffix with `enableSuffix = false` when space is limited
+- The "just now" threshold is 10 seconds for better UX
+- Time calculations handle months as 30 days and years as 365 days
+- For precise timestamps, show exact dates for items older than a week
+- Consider updating timeago strings periodically for live content (every minute)
+- Use appropriate locales for international applications
+
+---
+
+### ReCase - String Case Conversion
+
+**Overview**: ReCase provides comprehensive string case conversions between different naming conventions like camelCase, snake_case, kebab-case, and PascalCase, making it easy to transform text for different contexts.
+
+**Technical Explanation**: ReCase analyzes input strings to identify word boundaries using various delimiters (spaces, underscores, hyphens, case changes) and rebuilds them according to specific formatting rules. It handles special cases like all-caps text and preserves word integrity while converting between formats. The algorithm first splits text into words, then applies formatting rules for each target case.
+
+**Usage Examples**:
+
+1. **API and Database Field Conversion**:
+```dart
+// Convert between API and Dart naming conventions
+final apiField = "user_profile_image_url";
+final dartProperty = apiField.reCase.camelCase; // "userProfileImageUrl"
+
+// Convert for database table names
+final className = "UserProfileData";
+final tableName = className.reCase.snakeCase; // "user_profile_data"
+
+// URL parameter conversion
+final variableName = "sortDirection";
+final urlParam = variableName.reCase.paramCase; // "sort-direction"
+
+// Example usage in API mapping
+class ApiConverter {
+  static Map<String, dynamic> toDartMap(Map<String, dynamic> apiData) {
+    final dartMap = <String, dynamic>{};
+    
+    for (final entry in apiData.entries) {
+      final dartKey = entry.key.reCase.camelCase;
+      dartMap[dartKey] = entry.value;
+    }
+    
+    return dartMap;
+  }
+}
+```
+
+2. **Advanced Text Processing and File System Operations**:
+```dart
+class FilePathGenerator {
+  // Generate file paths in different formats
+  static String generatePath(String description, PathType type) {
+    final recase = description.reCase;
+    
+    return switch (type) {
+      PathType.unix => recase.pathCase,     // "user/profile/data"
+      PathType.url => recase.paramCase,     // "user-profile-data"  
+      PathType.constant => recase.constantCase, // "USER_PROFILE_DATA"
+      PathType.class => recase.pascalCase,  // "UserProfileData"
+    };
+  }
+}
+
+// Document title formatting
+class DocumentProcessor {
+  static String formatTitle(String rawTitle) {
+    final recase = rawTitle.reCase;
+    
+    // Clean multiple formats
+    final formats = {
+      'title': recase.titleCase,       // "User Profile Data"
+      'header': recase.headerCase,     // "User-Profile-Data"  
+      'sentence': recase.sentenceCase, // "User profile data"
+      'dot': recase.dotCase,          // "user.profile.data"
+    };
+    
+    return formats['title']!;
+  }
+}
+
+// Custom symbol set for special parsing
+final customRecase = ReCase._(
+  "my#special@text", 
+  {'#', '@', ' ', '_'}, // Custom word boundary symbols
+);
+
+print(customRecase.camelCase); // "mySpecialText"
+```
+
+**Notes/Best Practices**:
+- Default symbol set includes space, period, slash, underscore, backslash, and hyphen
+- Use `camelCase` for Dart properties and variables  
+- Use `snake_case` for database fields and file names
+- Use `PascalCase` for class names and types
+- Use `param-case` for URLs and CSS classes
+- Use `CONSTANT_CASE` for environment variables and constants
+- The algorithm handles all-caps input intelligently (e.g., "XML_HTTP_REQUEST")
+- Custom symbol sets allow parsing domain-specific text formats
+
+---
+
+## 📊 Data Structures
+
+### LRU Cache - Least Recently Used Cache
+
+**Overview**: LRU Cache is a memory-efficient caching data structure that automatically removes the least recently used items when the cache reaches capacity, providing fast access to frequently used data while maintaining bounded memory usage.
+
+**Technical Explanation**: The LRU Cache combines a HashMap for O(1) key lookups with a doubly-linked list to track access order. When an item is accessed or added, it moves to the front of the list. When capacity is exceeded, items are removed from the back of the list (least recently used). This implementation uses LinkedHashMap's insertion order to track usage, providing O(1) operations for get, put, and remove.
+
+**Usage Examples**:
+
+1. **Simple Data Caching**:
+```dart
+// Create cache with capacity of 100 items
+final cache = LruCache<String, User>(100);
+
+// Store user data (promotes to most recently used)
+cache['user123'] = User(id: '123', name: 'John Doe');
+cache.put('user456', User(id: '456', name: 'Jane Smith'));
+
+// Retrieve data (promotes key to MRU)
+final user = cache.get('user123');
+final userAlt = cache['user123']; // Same as get()
+
+print('Cache size: ${cache.length}');
+print('Has user456: ${cache.containsKey('user456')}');
+
+// When cache exceeds capacity, least recently used items are evicted
+for (int i = 0; i < 150; i++) {
+  cache['temp_$i'] = User(id: 'temp_$i', name: 'Temp User $i');
+}
+// Only the last 100 users remain, earlier ones evicted
+```
+
+2. **Advanced Caching with Computed Values**:
+```dart
+class ImageCache {
+  final LruCache<String, Future<Image>> _cache;
+  final HttpClient _httpClient = HttpClient();
+  
+  ImageCache({int capacity = 50}) : _cache = LruCache(capacity);
+  
+  Future<Image> getImage(String url) async {
+    // Check if image is already cached or being loaded
+    final cached = _cache.get(url);
+    if (cached != null) return cached;
+    
+    // Start loading and cache the future immediately
+    final future = _loadImage(url);
+    _cache.put(url, future);
+    
+    return future;
+  }
+  
+  Future<Image> _loadImage(String url) async {
+    final request = await _httpClient.getUrl(Uri.parse(url));
+    final response = await request.close();
+    return decodeImage(await response.expand((e) => e).toList());
+  }
+  
+  void preloadImages(List<String> urls) {
+    for (final url in urls) {
+      // putIfAbsent only loads if not already present
+      _cache.putIfAbsent(url, () => _loadImage(url));
+    }
+  }
+  
+  // Cache statistics
+  Map<String, dynamic> get stats => {
+    'size': _cache.length,
+    'capacity': _cache.capacity,
+    'utilization': _cache.length / _cache.capacity,
+    'keys': _cache.keys.toList(),
+  };
+  
+  void dispose() {
+    _cache.clear();
+    _httpClient.close();
+  }
+}
+
+// Usage with automatic cleanup
+final imageCache = ImageCache(capacity: 20);
+
+// These will be cached and reused
+final avatar1 = await imageCache.getImage('https://example.com/avatar1.jpg');
+final avatar2 = await imageCache.getImage('https://example.com/avatar2.jpg');
+
+// Accessing avatar1 again promotes it to most recently used
+final avatar1Again = await imageCache.getImage('https://example.com/avatar1.jpg');
+assert(identical(avatar1, avatar1Again)); // Same Future object
+```
+
+**Notes/Best Practices**:
+- Choose capacity based on memory constraints and access patterns
+- Use `get()` method to promote keys to most recently used
+- `put()` always promotes keys, even for updates
+- `putIfAbsent()` is efficient for lazy loading patterns
+- Reading promotes keys automatically, which affects iteration order
+- Consider caching expensive-to-compute values, not just data
+- The cache is thread-safe for reads but not for concurrent modifications
+- Use `clear()` to free memory when cache is no longer needed
+- Monitor cache hit rates to optimize capacity and performance
+
+---
+
+## 🎯 Extensions and Utilities
+
+Now let's examine the extensive collection of extensions that make Dart development more convenient and expressive.
