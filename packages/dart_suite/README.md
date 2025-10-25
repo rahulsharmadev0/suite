@@ -57,7 +57,11 @@ A versatile Dart package offering a comprehensive collection of utilities, exten
 - [📦 Options & Null Safety](#-options--null-safety)
 - [⏰ Time Utilities](#-time-utilities)
   - [Timeago](#-timeago)
-- [🔤 Text Processing](#-text-processing)
+- [🔐 OTP Utilities](#-otp-utilities)
+  - [HOTP](#-hotp)
+  - [TOTP](#-totp)
+  - [otpauth URIs](#-otpauth-uris)
+- [🔠 Text Processing](#-text-processing)
   - [ ReCase](#-recase)
   - [RegPatterns](#-regpatterns)
 - [🌐 URL Schemes](#-url-schemes)
@@ -804,7 +808,65 @@ print(timeago.format(
 
 ---
 
-## 🔤 Text Processing
+## 🔐 OTP Utilities
+
+> **Generate and verify HOTP/TOTP codes for modern multi-factor authentication flows**
+
+These helpers follow RFC 4226 (HOTP) and RFC 6238 (TOTP) and lean on Base32 secrets plus configurable hashing (`SHA1`, `SHA256`, `SHA512`). They are ideal for integrating hardware-token style counters, authenticator apps, or in-house MFA challenges.
+
+### 🔢 HOTP
+
+- Stateful counter that increments after each code generation unless you pass an override.
+- Works well for SMS/e-mail OTP flows or hardware tokens that advance a counter manually.
+
+```dart
+import 'package:dart_suite/dart_suite.dart';
+
+final hotp = Hotp(
+  secret: 'JBSWY3DPEHPK3PXP',
+  counter: 42, // persisted per user/device
+  length: 6,
+);
+
+final code = hotp.generateCode();        // e.g. "836082"
+final isValid = hotp.verifyCode(code); // true (also bumps the counter)
+```
+
+### ⏳ TOTP
+
+- Time-based OTP with a configurable window (`period`, default 30s) and optional `startTime` offset.
+- `verifyCode` handles drift by checking surrounding time slices; `remainingSeconds` tells you when the next code will roll.
+- Swap hashing algorithms when you need stronger digests.
+
+```dart
+final totp = TOTP(
+  secret: 'JBSWY3DPEHPK3PXP',
+  period: 30,
+  algorithm: HashAlgorithm.SHA256,
+);
+
+final current = totp.generateCode();
+final stillValid = totp.verifyCode(current, drift: 1); // allow ±1 window
+final secondsLeft = totp.remainingSeconds();
+```
+
+### 📮 otpauth URIs
+
+Quickly produce `otpauth://` URIs that you can turn into QR codes for Google Authenticator, Authy, 1Password, etc.
+
+```dart
+final uri = totp.generateURI(
+  'user@example.com',
+  issuer: 'AcmeCo',
+);
+// otpauth://totp/AcmeCo:user@example.com?secret=...&issuer=AcmeCo&algorithm=SHA256&digits=6&period=30
+```
+
+Use any QR-code library to surface this URI in onboarding flows, or store it as part of recovery workflows.
+
+---
+
+## 🔠 Text Processing
 
 ### 🔄 ReCase
 

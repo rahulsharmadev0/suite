@@ -19,7 +19,10 @@ class RetryPolicy {
     this.randomizeDelay = true,
   });
 
-  /// Default retry policy for network operations
+  /// A predefined retry policy optimized for network operations with exponential backoff.
+  ///
+  /// Attempts up to 3 retries with delays of 1s, 2s, and 4s (capped at 10s).
+  /// Automatically skips retrying non-recoverable exceptions.
   static const RetryPolicy defaultPolicy = RetryPolicy(
     maxAttempts: 3,
     initialDelay: Duration(milliseconds: 1000),

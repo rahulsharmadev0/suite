@@ -1,5 +1,14 @@
-
 # Changelog
+
+## 0.0.8 - Minor 🚀
+### 🎉 Upgrade to dart_suite ^0.0.8
+
+### New Features ✨
+- Introduced one-time-password utilities with `Hotp`, `TOTP`, and configurable `HashAlgorithm` support for MFA workflows.
+- Added helper APIs for drift-tolerant verification, window timing, and otpauth URI generation.
+
+### Documentation 📚
+- Expanded README with usage guidance and examples for the OTP helpers.
 
 ## 0.0.7 - Patch 📃
 ### 🎉 Upgrade to dart_suite ^0.0.7
